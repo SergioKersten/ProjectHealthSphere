@@ -1,0 +1,87 @@
+/* BehandlungsDokumentation.css */
+.behandlungs-dokumentation {
+  padding: 20px;
+}
+
+.behandlungs-dokumentation h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.patient-info {
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 30px;
+}
+
+.patient-info h3 {
+  margin-bottom: 5px;
+  color: #1976d2;
+}
+
+.progress-steps {
+  display: flex;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.progress-steps::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #e0e0e0;
+  z-index: -1;
+}
+
+.step {
+  flex: 1;
+  text-align: center;
+  padding-top: 30px;
+  position: relative;
+}
+
+.step::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  border: 2px solid white;
+  z-index: 2;
+}
+
+.step.active::before {
+  background-color: #1976d2;
+  width: 16px;
+  height: 16px;
+  top: 7px;
+}
+
+.step.completed::before {
+  background-color: #4caf50;
+}
+
+.behandlung-form,
+.diagnose-form,
+.medikation-form {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+.behandlung-form h3,
+.diagnose-form h3,
+.medikation-form h3 {
+  margin-bottom: 20px;
+  color: #333;
+}

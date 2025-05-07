@@ -1,0 +1,117 @@
+/* ArztTermine.css */
+.arzt-termine {
+  padding: 20px;
+}
+
+.arzt-termine h2 {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.termin-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.date-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-selector label {
+  font-weight: 500;
+  color: #555;
+}
+
+.date-selector input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.termin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.termin-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  display: flex;
+  gap: 20px;
+}
+
+.termin-time {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1976d2;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #eee;
+}
+
+.termin-details {
+  flex: 1;
+}
+
+.termin-details h3 {
+  margin-bottom: 5px;
+  font-size: 1.1rem;
+}
+
+.termin-duration {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.termin-notes {
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.termin-actions {
+  margin-top: 10px;
+}
+
+.termin-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 30px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.dialog-content h3 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
