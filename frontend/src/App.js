@@ -22,7 +22,7 @@ function App() {
           <Navigation />
           <main className="content">
             <Routes>
-              {/*<Route path="/login" element={<Login />} />*/}
+              {/*<Route path="/login" element={<Login />} /> this comment is just so I can create a new branch*/}
               <Route path="/" element={<PrivateRoute />}>
                 <Route index element={<Dashboard />} />
                 <Route path="patienten" element={<PatientenListe />} />
