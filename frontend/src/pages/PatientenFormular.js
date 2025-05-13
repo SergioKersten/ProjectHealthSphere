@@ -125,10 +125,10 @@ const PatientenFormular = () => {
             {...register('versicherungID')}
           >
             <option value="">Bitte wählen</option>
-            <option value="1">AOK</option>
-            <option value="2">TK</option>
-            <option value="3">Barmer</option>
-            <option value="4">DAK</option>
+            <option value="1">FlixFixer Versicherung</option>
+            <option value="2">Pillbox Plus Versicherung</option>
+            <option value="3">VivaLaVita KrankenKasse</option>
+            <option value="4">PflasterUndWeg Versicherung</option>
             {/* Diese würden dynamisch aus der API geladen */}
           </select>
         </div>

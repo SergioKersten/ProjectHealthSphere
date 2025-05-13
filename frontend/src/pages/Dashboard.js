@@ -57,7 +57,7 @@ const Dashboard = () => {
     
     loadDashboardData();
   }, [user]);
-  
+  {/*
   if (loading) {
     return <div className="loading">Lade Dashboard...</div>;
   }
@@ -65,7 +65,7 @@ const Dashboard = () => {
   if (error) {
     return <div className="error-message">{error}</div>;
   }
-  
+  */}
   return (
     <div className="dashboard">
       <h2>Dashboard</h2>

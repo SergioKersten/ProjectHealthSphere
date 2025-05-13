@@ -41,7 +41,7 @@ const PatientenListe = () => {
       }
     }
   };
-  
+
   if (loading && patienten.length === 0) {
     return <div className="loading">Lade Patientendaten...</div>;
   }
@@ -49,7 +49,7 @@ const PatientenListe = () => {
   if (error) {
     return <div className="error-message">{error}</div>;
   }
-  
+
   return (
     <div className="patienten-liste">
       <h2>Patienten</h2>

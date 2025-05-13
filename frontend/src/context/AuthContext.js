@@ -8,9 +8,9 @@ export const AuthProvider = ({ children }) => {
 
   const defaultAdminUser = {
     benutzerID: 1,
-    benutzername: 'admin',
-    name: 'Administrator',
-    rolle: 'ADMIN',
+    benutzername: 'Hagemann',
+    name: 'Dr. med. Hagemann',
+    rolle: 'ÄRZTIN',
     arztID: 1
   };
 
