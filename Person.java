@@ -1,13 +1,13 @@
 import java.time.LocalDate;
 
 class Person {
-    static long personId;
-    String name;
-    String firstname;
-    String phonenumber;
-    String email;
-    String adress;
-    LocalDate birthdate;
+     private long personId;
+    protected String name;
+    protected String firstname;
+    protected String phonenumber;
+    protected String email;
+    protected String adress;
+    protected LocalDate birthdate;
 
     public Person(long personId, String name, String firstname, String phonenumber, String email, LocalDate brithdate,
             String adress) {

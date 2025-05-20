@@ -19,11 +19,18 @@ public class PatientList {
         return true;
     };
 
-    public boolean deletPatient(long personId) {
-        j  = 
-        i = (ListOfPatients.findIndex(per))
-        for(int i = )
-        return false;
-    };
+     public boolean deletePatient(long personId) {
+        for (int i = 0; i < anzahl; i++) {
+            if (listOfPatients[i].getPersonId() == personId) {
+                for (int j = i; j < anzahl - 1; j++) {
+                    listOfPatients[j] = listOfPatients[j + 1];
+                }
+                listOfPatients[anzahl - 1] = null; 
+                anzahl--;
+                return true; 
+            }
+        }
+        return false; 
+}
 
 }
