@@ -1,7 +1,8 @@
 import java.time.LocalDate;
+import java.util.*;
 
 class Person {
-     private long personId;
+    private long personId;
     protected String name;
     protected String firstname;
     protected String phonenumber;
@@ -21,19 +22,21 @@ class Person {
     }
 
     @Override
-public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof Person)) return false;
-    Person person = (Person) o;
-    return personId == person.personId;
-}
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Person))
+            return false;
+        Person person = (Person) o;
+        return personId == person.personId;
+    }
 
-@Override
-public int hashCode() {
-    return Objects.hash(personId);
-}
+    @Override
+    public int hashCode() {
+        return Objects.hash(personId);
+    }
 
-public long getPersonId() {
-    return personId;
-}
+    public long getPersonId() {
+        return personId;
+    }
 }

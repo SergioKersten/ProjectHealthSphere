@@ -11,7 +11,15 @@ class Employee extends Person {
     }
 
     public long getPersonId() {
-     return super.getPersonId();
+        return super.getPersonId();
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }
