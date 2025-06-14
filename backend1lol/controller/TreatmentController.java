@@ -1,4 +1,4 @@
-package backend.controller;
+package backend1lol.controller;
 
 import java.util.Set;
 
@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import backend.components.Treatment;
-import backend.manager.TreatmentManager;
+import backend1lol.components.Treatment;
+import backend1lol.manager.TreatmentManager;
 
 @RestController
 @RequestMapping("/api/treatments")

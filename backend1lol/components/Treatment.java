@@ -1,10 +1,10 @@
-package backend.components;
+package backend1lol.components;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import backend.manager.PersonManager;
+import backend1lol.manager.PersonManager;
 
 public class Treatment implements Serializable {
     private static final long serialVersionUID = 4L;

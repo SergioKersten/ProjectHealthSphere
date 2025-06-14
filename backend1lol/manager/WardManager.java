@@ -1,11 +1,11 @@
-package backend.manager;
+package backend1lol.manager;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import backend.components.Ward;
+import backend1lol.components.Ward;
 
 public class WardManager {
     private Set<Ward> wardSet = new HashSet<>();

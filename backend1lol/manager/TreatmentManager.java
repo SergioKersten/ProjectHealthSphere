@@ -1,12 +1,12 @@
-package backend.manager;
+package backend1lol.manager;
 
 import java.util.*;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import backend.components.Treatment;
-import backend.serialization.SerializationManager;
+import backend1lol.components.Treatment;
+import backend1lol.serialization.SerializationManager;
 
 public class TreatmentManager {
     private Set<Treatment> treatmentSet = new HashSet<>();

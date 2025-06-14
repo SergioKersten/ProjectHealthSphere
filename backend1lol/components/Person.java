@@ -1,4 +1,4 @@
-package backend.components;
+package backend1lol.components;
 
 import java.io.Serializable;
 import java.time.LocalDate;
