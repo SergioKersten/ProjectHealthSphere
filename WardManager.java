@@ -5,15 +5,52 @@ import java.util.stream.Collectors;
 
 public class WardManager {
     private Set<Ward> wardSet = new HashSet<>();
+    private String filename; // Dateiname für automatisches Speichern
+    private boolean autoSaveEnabled = true;
+
+    // Konstruktor ohne Auto-Save
+    public WardManager() {
+    }
+    
+    // Konstruktor mit Auto-Save
+    public WardManager(String filename) {
+        this.filename = filename;
+        this.autoSaveEnabled = true;
+        load(); // Automatisch laden beim Start
+    }
+    
+    // Auto-Save nachträglich aktivieren
+    public void enableAutoSave(String filename) {
+        this.filename = filename;
+        this.autoSaveEnabled = true;
+    }
+    
+    public void disableAutoSave() {
+        this.autoSaveEnabled = false;
+    }
+
+    private void autoSave() {
+        if (autoSaveEnabled && filename != null) {
+            SerializationManager.saveToFile(wardSet, filename);
+        }
+    }
 
     // Add a new ward
     public boolean addWard(Ward ward) {
-        return wardSet.add(ward); // returns false if Ward with same ID already exists
+        boolean result = wardSet.add(ward);
+        if (result) {
+            autoSave(); // Speichern nur bei erfolgreicher Änderung
+        }
+        return result;
     }
 
     // Remove a ward by ID
     public boolean deleteWard(int wardId) {
-        return wardSet.removeIf(w -> w.getWardId() == wardId);
+        boolean result = wardSet.removeIf(w -> w.getWardId() == wardId);
+        if (result) {
+            autoSave(); // Speichern nur bei erfolgreicher Änderung
+        }
+        return result;
     }
 
     // Find a ward by ID
@@ -48,8 +85,27 @@ public class WardManager {
                 ward.setDescription(newDescription);
             if (newCapacity != null)
                 ward.setCapacity(newCapacity);
+            
+            autoSave(); // Speichern nach Update
             return true;
         }
         return false;
+    }
+    
+    // Manuelles Speichern
+    public void save() {
+        if (filename != null) {
+            SerializationManager.saveToFile(wardSet, filename);
+        }
+    }
+    
+    // Laden von Datei
+    public void load() {
+        if (filename != null && SerializationManager.fileExists(filename)) {
+            Set<Ward> loadedData = SerializationManager.loadFromFile(filename);
+            if (loadedData != null) {
+                wardSet = loadedData;
+            }
+        }
     }
 }

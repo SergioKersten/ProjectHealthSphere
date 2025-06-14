@@ -6,13 +6,14 @@ public class Main {
         // Manager mit automatischem Speichern erstellen
         PersonManager<Patient> patientenManager = new PersonManager<>("patients.ser");
         PersonManager<Employee> employeeManager = new PersonManager<>("employees.ser");
-        TreatmentManager treatmentManager = new TreatmentManager("treatment.ser");
-        TreatmentManager wardManager = new WardManager("ward.ser");
+        TreatmentManager treatmentManager = new TreatmentManager("treatments.ser");
+        WardManager wardManager = new WardManager("wards.ser");
 
         System.out.println("=== Geladene Daten ===");
         System.out.println("Patienten: " + patientenManager.getAll().size());
         System.out.println("Mitarbeiter: " + employeeManager.getAll().size());
         System.out.println("Behandlungen: " + treatmentManager.getAll().size());
+        System.out.println("Stationen: " + wardManager.getAll().size());
 
         //treatmentManager.deleteTreatment(1);
         
@@ -49,10 +50,17 @@ public class Main {
         Treatment t = new Treatment(2, LocalDate.now(), "Physio", 1, 1);
         treatmentManager.addTreatment(t);
 
+        System.out.println("\n=== Stationen hinzufügen ===");
+        Ward w1 = new Ward(1, "Intensive Care", "Critical patients", 10);
+        Ward w2 = new Ward(2, "Pediatrics", "Children", 8);
+        wardManager.addWard(w1); // Speichert automatisch!
+        wardManager.addWard(w2); // Speichert automatisch!
+
         // Daten ändern - speichert automatisch
         System.out.println("\n=== Daten ändern ===");
         patientenManager.updatePerson(1, null, null, "0123-UPDATED", null, null);
         employeeManager.updateEmployeeDepartment(1, "Kardiologie");
+        wardManager.updateWard(1, null, "Updated description", 12); // Speichert automatisch!
 
         // Einen Patienten löschen - speichert automatisch
         System.out.println("\n=== Patient löschen ===");
@@ -70,9 +78,17 @@ public class Main {
         employeeManager.getAll().forEach(e -> System.out.println("- [" + e.getPersonId() + "]" + e.getFirstname() + " " + e.getName() + " (" +
                 e.getDepartment() + ")"));
 
-        
-        System.out.println("\nBehandlung:");
-        treatmentManager.getAll().forEach(f -> System.out.println("- [" + f.getPatientPersonId() + "]  - " + patientenManager.findById(f.getPatientPersonId()).getName() +" "+ f.getTherapy()));
+        System.out.println("\nBehandlungen:");
+        treatmentManager.getAll().forEach(f -> {
+            Patient patient = patientenManager.findById(f.getPatientPersonId());
+            String patientName = (patient != null) ? patient.getName() : "Unbekannt";
+            String patientVorname = (patient != null) ? patient.getFirstname() : "Unbekannt";
+            System.out.println("- [" + f.getTreatmentId() + "] Patient: " + patientVorname + " " + patientName + " - " + f.getTherapy());
+        });
+
+        System.out.println("\nStationen:");
+        wardManager.getAll().forEach(w -> System.out.println("- [" + w.getWardId() + "] " + w.getWardName() + " (" + 
+                w.getCapacity() + " Betten) - " + w.getDescription()));
 
         System.out.println("\n=== Alle Änderungen wurden automatisch gespeichert! ===");
 
@@ -83,21 +99,9 @@ public class Main {
             System.out.println("Patient gefunden: " + gefunden.getFirstname() + " " +
                     gefunden.getName());
         }
-        // Get info
-        //Treatment found = treatmentManager.findById(1);
-        //System.out.println(found.getTherapy());
 
         // Update
-        treatmentManager.updateTherapy(1, "Massage");
-
-        // ------ WardManager TestCases without filtering
-        WardManager wardManager = new WardManager();
-
-        wardManager.addWard(new Ward(1, "Intensive Care", "Critical patients", 10));
-        wardManager.addWard(new Ward(2, "Pediatrics", "Children", 8));
-
-        // Update
-        wardManager.updateWard(1, null, "Updated description", 12);
+        treatmentManager.updateTherapy(2, "Massage");
 
         // Test: Auto-Save deaktivieren/aktivieren
         System.out.println("\n=== Auto-Save Test ===");
@@ -106,7 +110,5 @@ public class Main {
 
         patientenManager.enableAutoSave("patients_backup.ser");
         System.out.println("Auto-Save für Backup-Datei aktiviert");
-        
-
     }
 }
