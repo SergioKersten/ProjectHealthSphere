@@ -1,4 +1,4 @@
-package backend1lol.serialization;
+package com.healthsphere.serialization;
 
 import java.io.*;
 import java.util.Set;

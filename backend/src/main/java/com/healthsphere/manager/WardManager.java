@@ -1,11 +1,11 @@
-package backend1lol.manager;
+package com.healthsphere.manager;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import backend1lol.components.Ward;
+import com.healthsphere.components.Ward;
 
 public class WardManager {
     private Set<Ward> wardSet = new HashSet<>();

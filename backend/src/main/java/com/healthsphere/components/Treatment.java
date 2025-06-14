@@ -1,10 +1,10 @@
-package backend1lol.components;
+package com.healthsphere.components;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import backend1lol.manager.PersonManager;
+import com.healthsphere.manager.PersonManager;
 
 public class Treatment implements Serializable {
     private static final long serialVersionUID = 4L;

@@ -3,14 +3,6 @@ package backend1lol;
 import java.time.*;
 import java.util.Set;
 
-import backend1lol.components.Employee;
-import backend1lol.components.Patient;
-import backend1lol.components.Treatment;
-import backend1lol.components.Ward;
-import backend1lol.manager.PersonManager;
-import backend1lol.manager.TreatmentManager;
-import backend1lol.manager.WardManager;
-
 public class Main {
         public static void main(String[] args) {
                 // Manager mit automatischem Speichern erstellen

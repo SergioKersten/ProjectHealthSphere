@@ -1,13 +1,13 @@
-package backend1lol.manager;
+package com.healthsphere.manager;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import backend1lol.components.Employee;
-import backend1lol.components.Person;
-import backend1lol.serialization.SerializationManager;
+import com.healthsphere.components.Employee;
+import com.healthsphere.components.Person;
+import com.healthsphere.serialization.SerializationManager;
 
 public class PersonManager<T extends Person> {
     private Set<T> personenSet = new HashSet<>();

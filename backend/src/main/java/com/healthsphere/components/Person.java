@@ -1,4 +1,4 @@
-package backend1lol.components;
+package com.healthsphere.components;
 
 import java.io.Serializable;
 import java.time.LocalDate;
