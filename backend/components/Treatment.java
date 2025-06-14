@@ -1,10 +1,14 @@
+package backend.components;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import backend.manager.PersonManager;
+
 public class Treatment implements Serializable {
     private static final long serialVersionUID = 4L;
-    
+
     private int treatmentId;
     private LocalDate date;
     private String therapy;
@@ -42,8 +46,10 @@ public class Treatment implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Treatment)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Treatment))
+            return false;
         Treatment treatment = (Treatment) o;
         return treatmentId == treatment.treatmentId;
     }

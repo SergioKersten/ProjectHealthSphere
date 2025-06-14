@@ -1,8 +1,13 @@
-import java.time.LocalDate;
+package backend.manager;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import backend.components.Employee;
+import backend.components.Person;
+import backend.serialization.SerializationManager;
 
 public class PersonManager<T extends Person> {
     private Set<T> personenSet = new HashSet<>();
@@ -12,20 +17,20 @@ public class PersonManager<T extends Person> {
     // Konstruktor ohne Auto-Save
     public PersonManager() {
     }
-    
+
     // Konstruktor mit Auto-Save
     public PersonManager(String filename) {
         this.filename = filename;
         this.autoSaveEnabled = true;
         load(); // Automatisch laden beim Start
     }
-    
+
     // Auto-Save nachträglich aktivieren
     public void enableAutoSave(String filename) {
         this.filename = filename;
         this.autoSaveEnabled = true;
     }
-    
+
     public void disableAutoSave() {
         this.autoSaveEnabled = false;
     }
@@ -79,7 +84,7 @@ public class PersonManager<T extends Person> {
                 person.setEmail(newEmail);
             if (newAdress != null)
                 person.setAdress(newAdress);
-            
+
             autoSave(); // Speichern nach Update
             return true;
         }
@@ -101,14 +106,14 @@ public class PersonManager<T extends Person> {
                 .filter(criteria)
                 .collect(Collectors.toSet());
     }
-    
+
     // Manuelles Speichern
     public void save() {
         if (filename != null) {
             SerializationManager.saveToFile(personenSet, filename);
         }
     }
-    
+
     // Laden von Datei
     public void load() {
         if (filename != null && SerializationManager.fileExists(filename)) {

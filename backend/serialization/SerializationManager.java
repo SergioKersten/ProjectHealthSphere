@@ -1,8 +1,10 @@
+package backend.serialization;
+
 import java.io.*;
 import java.util.Set;
 
 public class SerializationManager {
-    
+
     // Generische Methode zum Speichern von Sets
     public static <T extends Serializable> void saveToFile(Set<T> data, String filename) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
@@ -12,7 +14,7 @@ public class SerializationManager {
             System.err.println("Fehler beim Speichern: " + e.getMessage());
         }
     }
-    
+
     // Generische Methode zum Laden von Sets
     @SuppressWarnings("unchecked")
     public static <T extends Serializable> Set<T> loadFromFile(String filename) {
@@ -25,7 +27,7 @@ public class SerializationManager {
             return null;
         }
     }
-    
+
     // Methode zum Prüfen ob eine Datei existiert
     public static boolean fileExists(String filename) {
         File file = new File(filename);

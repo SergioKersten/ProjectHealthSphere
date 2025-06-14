@@ -1,10 +1,12 @@
+package backend.components;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 
-class Person implements Serializable {
+public class Person implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     private long personId;
     protected String name;
     protected String firstname;

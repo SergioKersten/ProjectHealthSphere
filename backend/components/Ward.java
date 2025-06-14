@@ -1,3 +1,5 @@
+package backend.components;
+
 import java.util.Objects;
 
 public class Ward {

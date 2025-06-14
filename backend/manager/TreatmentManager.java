@@ -1,7 +1,12 @@
+package backend.manager;
+
 import java.util.*;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import backend.components.Treatment;
+import backend.serialization.SerializationManager;
 
 public class TreatmentManager {
     private Set<Treatment> treatmentSet = new HashSet<>();
@@ -11,20 +16,20 @@ public class TreatmentManager {
     // Konstruktor ohne Auto-Save
     public TreatmentManager() {
     }
-    
+
     // Konstruktor mit Auto-Save
     public TreatmentManager(String filename) {
         this.filename = filename;
         this.autoSaveEnabled = true;
         load(); // Automatisch laden beim Start
     }
-    
+
     // Auto-Save nachträglich aktivieren
     public void enableAutoSave(String filename) {
         this.filename = filename;
         this.autoSaveEnabled = true;
     }
-    
+
     public void disableAutoSave() {
         this.autoSaveEnabled = false;
     }
@@ -88,20 +93,20 @@ public class TreatmentManager {
                 treatment.setPatientPersonId(newPatientId);
             if (newDoctorId > 0)
                 treatment.setDoctorPersonId(newDoctorId);
-            
+
             autoSave(); // Speichern nach Update
             return true;
         }
         return false;
     }
-    
+
     // Manuelles Speichern
     public void save() {
         if (filename != null) {
             SerializationManager.saveToFile(treatmentSet, filename);
         }
     }
-    
+
     // Laden von Datei
     public void load() {
         if (filename != null && SerializationManager.fileExists(filename)) {
