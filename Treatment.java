@@ -4,23 +4,36 @@ public class Treatment {
     private int treatmentId;
     private LocalDate date;
     private String therapy;
-    private Patient patient;
-    private Employee doctor;
+    private long patientPersonId;
+    private long doctorPersonId;
 
-    public Treatment(int treatmentId, LocalDate date, String therapy, Patient patient, Employee doctor) {
+    public Treatment(int treatmentId, LocalDate date, String therapy, long patientPersonId, long doctorPersonId) {
         this.treatmentId = treatmentId;
         this.date = date;
         this.therapy = therapy;
-        this.patient = patient;
-        this.doctor = doctor;
+        this.patientPersonId = patientPersonId;
+        this.doctorPersonId = doctorPersonId;
     }
 
-    public void getTreatmentDetails() {
-        System.out.println("Behandlung ID: " + treatmentId);
-        System.out.println("Datum: " + date);
-        System.out.println("Therapie: " + therapy);
-        System.out.println("Patient: " + patient.getFirstname() + " " + patient.getName());
-        System.out.println("Behandelnder Arzt: " + doctor.getFirstname() + " " + doctor.getName());
+    public void printTreatmentDetails(PersonManager<Patient> patientManager, PersonManager<Employee> employeeManager) {
+        Patient patient = patientManager.findById(patientPersonId);
+        Employee doctor = employeeManager.findById(doctorPersonId);
+
+        System.out.println("Treatment ID: " + treatmentId);
+        System.out.println("Date: " + date);
+        System.out.println("Therapy: " + therapy);
+
+        if (patient != null) {
+            System.out.println("Patient: " + patient.getFirstname() + " " + patient.getName());
+        } else {
+            System.out.println("Patient: Not found (ID = " + patientPersonId + ")");
+        }
+
+        if (doctor != null) {
+            System.out.println("Doctor: " + doctor.getFirstname() + " " + doctor.getName());
+        } else {
+            System.out.println("Doctor: Not found (ID = " + doctorPersonId + ")");
+        }
     }
 
     public int getTreatmentId() {
@@ -51,19 +64,19 @@ public class Treatment {
         this.therapy = therapy;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public long getPatientPersonId() {
+        return patientPersonId;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public void setPatientPersonId(long patientPersonId) {
+        this.patientPersonId = patientPersonId;
     }
 
-    public Employee getDoctor() {
-        return doctor;
+    public long getDoctorPersonId() {
+        return doctorPersonId;
     }
 
-    public void setDoctor(Employee doctor) {
-        this.doctor = doctor;
+    public void setDoctorPersonId(long doctorPersonId) {
+        this.doctorPersonId = doctorPersonId;
     }
 }
