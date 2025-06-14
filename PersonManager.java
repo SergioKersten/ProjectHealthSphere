@@ -6,13 +6,50 @@ import java.util.stream.Collectors;
 
 public class PersonManager<T extends Person> {
     private Set<T> personenSet = new HashSet<>();
+    private String filename; // Dateiname für automatisches Speichern
+    private boolean autoSaveEnabled = true;
+
+    // Konstruktor ohne Auto-Save
+    public PersonManager() {
+    }
+    
+    // Konstruktor mit Auto-Save
+    public PersonManager(String filename) {
+        this.filename = filename;
+        this.autoSaveEnabled = true;
+        load(); // Automatisch laden beim Start
+    }
+    
+    // Auto-Save nachträglich aktivieren
+    public void enableAutoSave(String filename) {
+        this.filename = filename;
+        this.autoSaveEnabled = true;
+    }
+    
+    public void disableAutoSave() {
+        this.autoSaveEnabled = false;
+    }
+
+    private void autoSave() {
+        if (autoSaveEnabled && filename != null) {
+            SerializationManager.saveToFile(personenSet, filename);
+        }
+    }
 
     public boolean addPerson(T person) {
-        return personenSet.add(person); // false wenn ID bereits vorhanden
+        boolean result = personenSet.add(person);
+        if (result) {
+            autoSave(); // Speichern nur bei erfolgreicher Änderung
+        }
+        return result;
     }
 
     public boolean deletePerson(long personId) {
-        return personenSet.removeIf(p -> p.getPersonId() == personId);
+        boolean result = personenSet.removeIf(p -> p.getPersonId() == personId);
+        if (result) {
+            autoSave(); // Speichern nur bei erfolgreicher Änderung
+        }
+        return result;
     }
 
     public T findById(long personId) {
@@ -42,6 +79,8 @@ public class PersonManager<T extends Person> {
                 person.setEmail(newEmail);
             if (newAdress != null)
                 person.setAdress(newAdress);
+            
+            autoSave(); // Speichern nach Update
             return true;
         }
         return false;
@@ -51,6 +90,7 @@ public class PersonManager<T extends Person> {
         T person = findById(personId);
         if (person instanceof Employee) {
             ((Employee) person).setDepartment(newDepartment);
+            autoSave(); // Speichern nach Update
             return true;
         }
         return false;
@@ -60,5 +100,22 @@ public class PersonManager<T extends Person> {
         return personenSet.stream()
                 .filter(criteria)
                 .collect(Collectors.toSet());
+    }
+    
+    // Manuelles Speichern
+    public void save() {
+        if (filename != null) {
+            SerializationManager.saveToFile(personenSet, filename);
+        }
+    }
+    
+    // Laden von Datei
+    public void load() {
+        if (filename != null && SerializationManager.fileExists(filename)) {
+            Set<T> loadedData = SerializationManager.loadFromFile(filename);
+            if (loadedData != null) {
+                personenSet = loadedData;
+            }
+        }
     }
 }
