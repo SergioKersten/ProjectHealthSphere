@@ -1,6 +1,10 @@
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 
-public class Treatment {
+public class Treatment implements Serializable {
+    private static final long serialVersionUID = 4L;
+    
     private int treatmentId;
     private LocalDate date;
     private String therapy;
@@ -36,17 +40,22 @@ public class Treatment {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Treatment)) return false;
+        Treatment treatment = (Treatment) o;
+        return treatmentId == treatment.treatmentId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(treatmentId);
+    }
+
     public int getTreatmentId() {
         return treatmentId;
     }
-
-    /*
-     * ------ brauchen wir eig gar nicht, wenn wir noch eine Verwaltungsklasse
-     * hinzufügen?!
-     * public void setTreatmentId(int treatmentId) {
-     * this.treatmentId = treatmentId;
-     * }
-     */
 
     public LocalDate getDate() {
         return date;

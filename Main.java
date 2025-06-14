@@ -6,10 +6,12 @@ public class Main {
         // Manager mit automatischem Speichern erstellen
         PersonManager<Patient> patientenManager = new PersonManager<>("patients.ser");
         PersonManager<Employee> employeeManager = new PersonManager<>("employees.ser");
+        TreatmentManager treatmentManager = new TreatmentManager("treatment.ser");
 
         System.out.println("=== Geladene Daten ===");
         System.out.println("Patienten: " + patientenManager.getAll().size());
         System.out.println("Mitarbeiter: " + employeeManager.getAll().size());
+        System.out.println("Behandlungen: " + treatmentManager.getAll().size());
 
         System.out.println("\n=== Aktuelle Daten ===");
         System.out.println("Patienten:");
@@ -71,8 +73,7 @@ public class Main {
                     gefunden.getName());
         }
         // ----- TreatmentManager TestCases without filtering
-        TreatmentManager treatmentManager = new TreatmentManager();
-
+ 
         Treatment t = new Treatment(1, LocalDate.now(), "Physio", 1001L, 2001L);
         treatmentManager.addTreatment(t);
 
