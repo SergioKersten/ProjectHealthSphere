@@ -10,16 +10,12 @@ class Employee extends Person {
         this.department = department;
     }
 
-    public long getPersonId() {
-        return super.getPersonId();
+    public String getDepartment() {
+        return department;
     }
 
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public String getName() {
-        return name;
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
 }

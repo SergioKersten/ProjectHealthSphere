@@ -15,8 +15,6 @@ public class Treatment {
         this.doctor = doctor;
     }
 
-    
-
     public void getTreatmentDetails() {
         System.out.println("Behandlung ID: " + treatmentId);
         System.out.println("Datum: " + date);
@@ -29,9 +27,13 @@ public class Treatment {
         return treatmentId;
     }
 
-    public void setTreatmentId(int treatmentId) {
-        this.treatmentId = treatmentId;
-    }
+    /*
+     * ------ brauchen wir eig gar nicht, wenn wir noch eine Verwaltungsklasse
+     * hinzufügen?!
+     * public void setTreatmentId(int treatmentId) {
+     * this.treatmentId = treatmentId;
+     * }
+     */
 
     public LocalDate getDate() {
         return date;
@@ -53,7 +55,15 @@ public class Treatment {
         return patient;
     }
 
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
+
     public Employee getDoctor() {
         return doctor;
+    }
+
+    public void setDoctor(Employee doctor) {
+        this.doctor = doctor;
     }
 }

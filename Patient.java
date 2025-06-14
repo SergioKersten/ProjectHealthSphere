@@ -6,15 +6,4 @@ public class Patient extends Person {
         super(personId, name, firstname, phonenumber, email, birthdate, adress);
     }
 
-    public long getPersonId() {
-        return super.getPersonId();
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public String getName() {
-        return name;
-    }
 }

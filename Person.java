@@ -39,4 +39,52 @@ class Person {
     public long getPersonId() {
         return personId;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public void setPhonenumber(String phonenumber) {
+        this.phonenumber = phonenumber;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setAdress(String adress) {
+        this.adress = adress;
+    }
+
+    public void setBirthdate(LocalDate birthdate) {
+        this.birthdate = birthdate;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public String getPhonenumber() {
+        return phonenumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getAdress() {
+        return adress;
+    }
+
+    public LocalDate getBirthdate() {
+        return birthdate;
+    }
 }
