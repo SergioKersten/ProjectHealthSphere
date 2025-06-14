@@ -7,12 +7,15 @@ public class Main {
         PersonManager<Patient> patientenManager = new PersonManager<>("patients.ser");
         PersonManager<Employee> employeeManager = new PersonManager<>("employees.ser");
         TreatmentManager treatmentManager = new TreatmentManager("treatment.ser");
+        TreatmentManager wardManager = new WardManager("ward.ser");
 
         System.out.println("=== Geladene Daten ===");
         System.out.println("Patienten: " + patientenManager.getAll().size());
         System.out.println("Mitarbeiter: " + employeeManager.getAll().size());
         System.out.println("Behandlungen: " + treatmentManager.getAll().size());
 
+        //treatmentManager.deleteTreatment(1);
+        
         System.out.println("\n=== Aktuelle Daten ===");
         System.out.println("Patienten:");
         patientenManager.getAll()
@@ -42,6 +45,10 @@ public class Main {
         employeeManager.addPerson(e1); // Speichert automatisch!
         employeeManager.addPerson(e2); // Speichert automatisch!
 
+        System.out.println("\n=== Behandlung hinzufügen ===");
+        Treatment t = new Treatment(2, LocalDate.now(), "Physio", 1, 1);
+        treatmentManager.addTreatment(t);
+
         // Daten ändern - speichert automatisch
         System.out.println("\n=== Daten ändern ===");
         patientenManager.updatePerson(1, null, null, "0123-UPDATED", null, null);
@@ -60,8 +67,12 @@ public class Main {
                         p.getPhonenumber() + ")"));
 
         System.out.println("\nMitarbeiter:");
-        employeeManager.getAll().forEach(e -> System.out.println("- " + e.getFirstname() + " " + e.getName() + " (" +
+        employeeManager.getAll().forEach(e -> System.out.println("- [" + e.getPersonId() + "]" + e.getFirstname() + " " + e.getName() + " (" +
                 e.getDepartment() + ")"));
+
+        
+        System.out.println("\nBehandlung:");
+        treatmentManager.getAll().forEach(f -> System.out.println("- [" + f.getPatientPersonId() + "]  - " + patientenManager.findById(f.getPatientPersonId()).getName() +" "+ f.getTherapy()));
 
         System.out.println("\n=== Alle Änderungen wurden automatisch gespeichert! ===");
 
@@ -72,14 +83,9 @@ public class Main {
             System.out.println("Patient gefunden: " + gefunden.getFirstname() + " " +
                     gefunden.getName());
         }
-        // ----- TreatmentManager TestCases without filtering
- 
-        Treatment t = new Treatment(1, LocalDate.now(), "Physio", 1001L, 2001L);
-        treatmentManager.addTreatment(t);
-
         // Get info
-        Treatment found = treatmentManager.findById(1);
-        System.out.println(found.getTherapy());
+        //Treatment found = treatmentManager.findById(1);
+        //System.out.println(found.getTherapy());
 
         // Update
         treatmentManager.updateTherapy(1, "Massage");
@@ -100,6 +106,7 @@ public class Main {
 
         patientenManager.enableAutoSave("patients_backup.ser");
         System.out.println("Auto-Save für Backup-Datei aktiviert");
+        
 
     }
 }
