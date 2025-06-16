@@ -2,7 +2,7 @@ package com.healthsphere.components;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Objects;
 
 public class Person implements Serializable {
     private static final long serialVersionUID = 1L;
