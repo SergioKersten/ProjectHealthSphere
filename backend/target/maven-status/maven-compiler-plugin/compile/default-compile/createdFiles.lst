@@ -1,11 +1,14 @@
 com\healthsphere\components\Patient.class
 com\healthsphere\controller\RestController.class
+com\healthsphere\serialization\SerializationManager.class
+com\healthsphere\serialization\employees.ser
+com\healthsphere\components\Treatment.class
+com\healthsphere\controller\TreatmentController.class
 com\healthsphere\manager\WardManager.class
 com\healthsphere\components\Person.class
-com\healthsphere\serialization\SerializationManager.class
 com\healthsphere\components\Ward.class
 com\healthsphere\App.class
 com\healthsphere\manager\TreatmentManager.class
-com\healthsphere\components\Treatment.class
 com\healthsphere\manager\PersonManager.class
 com\healthsphere\components\Employee.class
+com\healthsphere\serialization\patients.ser
