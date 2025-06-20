@@ -1,12 +1,17 @@
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\controller\TreatmentController.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\components\Patient.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\components\Person.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\components\Employee.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\components\Treatment.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\components\Ward.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\controller\RestController.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\manager\WardManager.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\manager\TreatmentManager.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\manager\PersonManager.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\serialization\SerializationManager.java
-C:\Users\eriks\Documents\ProjectHealthSphere\backend\src\main\java\com\healthsphere\App.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\controller\PatientController.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\controller\TreatmentController1.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\controller\WardController.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\components\Employee.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\serialization\SerializationManager.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\manager\WardManager.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\controller\TreatmentController.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\App.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\components\Ward.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\components\Treatment.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\controller\HealthController.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\controller\EmployeeController.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\manager\TreatmentManager.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\components\Person.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\manager\PersonManager.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\controller\RestController.java
+C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\src\main\java\com\healthsphere\components\Patient.java
