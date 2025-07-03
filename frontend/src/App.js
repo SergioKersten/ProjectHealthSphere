@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import logo from '../src/images/HealthSphereNew.png';
 import './App.css';
 import styled from 'styled-components';
+import { patientAPI, employeeAPI, treatmentAPI } from './services/api';
 
 // Styled Components
 const Wrapper = styled.div`
@@ -171,7 +172,42 @@ const handleDelete = (type, id) => {
   }
 };
 
+
 function PatientsList() {
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = async () => {
+    try {
+      setLoading(true);
+      const response = await patientAPI.getAll();
+      setPatients(response.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this patient?')) {
+      try {
+        await patientAPI.delete(id);
+        fetchPatients(); // Refresh list
+      } catch (err) {
+        alert('Error deleting patient: ' + err.message);
+      }
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
     <Content>
       <Header>
@@ -183,27 +219,21 @@ function PatientsList() {
           <tr>
             <Th>Name</Th>
             <Th>Date of Birth</Th>
-            <Th>Doctor</Th>
+            <Th>Phone</Th>
             <Th>Actions</Th>
           </tr>
         </thead>
         <tbody>
           {patients.map((patient) => (
-            <TableRow 
-              key={patient.id}
-              onClick={() => handleEdit('patient', patient.id)}
-            >
-              <Td>{patient.name}</Td>
-              <Td>{patient.dob}</Td>
-              <Td>{patient.doctor}</Td>
+            <TableRow key={patient.personId}>
+              <Td>{`${patient.firstname} ${patient.name}`}</Td>
+              <Td>{patient.birthdate}</Td>
+              <Td>{patient.phonenumber}</Td>
               <Td>
-                <ActionButton 
-                  type="delete"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete('patient', patient.id);
-                  }}
-                >
+                <ActionButton onClick={() => handleEdit('patient', patient.personId)}>
+                  Edit
+                </ActionButton>
+                <ActionButton onClick={() => handleDelete(patient.personId)}>
                   Delete
                 </ActionButton>
               </Td>
