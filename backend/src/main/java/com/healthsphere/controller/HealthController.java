@@ -1,7 +1,7 @@
 
-
 package com.healthsphere.controller;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,24 +36,30 @@ public class HealthController {
     @GetMapping("/statistics")
     public ResponseEntity<Map<String, Object>> getSystemStatistics() {
         Map<String, Object> stats = new HashMap<>();
-        
+
         try {
             // Initialize managers to get counts
             PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
             PersonManager<Employee> employeeManager = new PersonManager<>("employees.ser");
             TreatmentManager treatmentManager = new TreatmentManager("treatments.ser");
             WardManager wardManager = new WardManager();
-            
+
+            Patient p1 = new Patient(5, "Multi", "Miriam", "12121212121", "m.multi@web.de",
+                    LocalDate.of(2002, 12, 2), "Annanas 5");
+            patientManager.addPerson(p1);
+            patientManager.save();
+            patientManager.load();
+
             stats.put("totalPatients", patientManager.getAll().size());
             stats.put("totalEmployees", employeeManager.getAll().size());
             stats.put("totalTreatments", treatmentManager.getAll().size());
             stats.put("totalWards", wardManager.getAll().size());
             stats.put("lastUpdated", LocalDateTime.now());
-            
+
         } catch (Exception e) {
             stats.put("error", "Fehler beim Laden der Statistiken: " + e.getMessage());
         }
-        
+
         return ResponseEntity.ok(stats);
     }
 
