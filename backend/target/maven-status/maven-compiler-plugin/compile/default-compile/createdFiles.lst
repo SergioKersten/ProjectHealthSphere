@@ -1,5 +1,4 @@
 com\healthsphere\controller\TreatmentController1$TreatmentUpdateRequest.class
-com\healthsphere\controller\TreatmentController.class
 com\healthsphere\controller\EmployeeController.class
 com\healthsphere\manager\WardManager.class
 com\healthsphere\components\Person.class

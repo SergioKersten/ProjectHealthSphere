@@ -1,4 +1,5 @@
 
+/* 
 package com.healthsphere;
 
 public class App {
@@ -6,9 +7,8 @@ public class App {
         System.out.println("Hello World!");
     }
 }
+*/
 
-
-/*
 package com.healthsphere;
 
 import org.springframework.boot.SpringApplication;
@@ -20,4 +20,3 @@ public class App {
         SpringApplication.run(App.class, args);
     }
 }
-*/
