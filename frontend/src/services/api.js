@@ -34,12 +34,16 @@ export const employeeAPI = {
   delete: (id) => api.delete(`/employees/${id}`),
 };
 
-// Treatment API calls
+// Treatment API calls - erweitert um patientId-spezifische Anfragen
 export const treatmentAPI = {
   getAll: () => api.get('/treatments'),
   getById: (id) => api.get(`/treatments/${id}`),
+  getByPatientId: (patientId) => api.get(`/treatments/patient/${patientId}`), // Neue Funktion
+  getByDoctorId: (doctorId) => api.get(`/treatments/doctor/${doctorId}`),
+  getByDate: (date) => api.get(`/treatments/date/${date}`),
   create: (treatment) => api.post('/treatments', treatment),
   update: (id, treatment) => api.put(`/treatments/${id}`, treatment),
+  updateTherapy: (id, therapy) => api.put(`/treatments/${id}/therapy`, therapy),
   delete: (id) => api.delete(`/treatments/${id}`),
 };
 

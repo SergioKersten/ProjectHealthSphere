@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../src/images/HealthSphereNew.png';
 import './App.css';
 import styled from 'styled-components';
 import { patientAPI, employeeAPI, treatmentAPI } from './services/api';
+import PatientEdit from './PatientEdit'; // Import der neuen Komponente
 
-// Styled Components
+// Styled Components (bleiben unverändert)
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -109,14 +110,7 @@ const AddButton = styled.button`
   cursor: pointer;
 `;
 
-// Sample Data
-const patients = [
-  { id: 1, name: 'John Doe', dob: '01.01.1980', doctor: 'Dr. Williams' },
-  { id: 2, name: 'Jane Smith', dob: '05.12.1975', doctor: 'Dr. Johnson' },
-  { id: 3, name: 'Michael Johnson', dob: '23.07.1988', doctor: 'Dr. Davis' },
-  { id: 4, name: 'Emily Brown', dob: '10.04.1992', doctor: 'Dr. Wilson' },
-];
-
+// Sample Data für Doctors und Treatments (bleiben unverändert)
 const doctors = [
   { id: 1, name: 'Dr. Williams', specialty: 'Kardiologie', phone: '+49 30 12345678' },
   { id: 2, name: 'Dr. Johnson', specialty: 'Neurologie', phone: '+49 30 87654321' },
@@ -159,24 +153,23 @@ function SidebarNav() {
   );
 }
 
-// Handler functions
+// Handler functions für Doctors und Treatments (bleiben unverändert)
 const handleEdit = (type, id) => {
   console.log(`Edit ${type} with ID: ${id}`);
-  // Hier würdest du normalerweise ein Modal öffnen oder zur Edit-Seite navigieren
+  // Für doctors und treatments bleibt diese Funktion
 };
 
 const handleDelete = (type, id) => {
   if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
     console.log(`Delete ${type} with ID: ${id}`);
-    // Hier würdest du normalerweise den API-Call zum Löschen machen
   }
 };
-
 
 function PatientsList() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); // Hook für Navigation
 
   useEffect(() => {
     fetchPatients();
@@ -192,6 +185,11 @@ function PatientsList() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Aktualisierte handleEdit Funktion für Patienten
+  const handlePatientEdit = (personId) => {
+    navigate(`/patients/edit/${personId}`);
   };
 
   const handleDelete = async (id) => {
@@ -225,15 +223,28 @@ function PatientsList() {
         </thead>
         <tbody>
           {patients.map((patient) => (
-            <TableRow key={patient.personId}>
+            <TableRow 
+              key={patient.personId}
+              onClick={() => handlePatientEdit(patient.personId)} // Aktualisiert für Navigation
+            >
               <Td>{`${patient.firstname} ${patient.name}`}</Td>
               <Td>{patient.birthdate}</Td>
               <Td>{patient.phonenumber}</Td>
               <Td>
-                <ActionButton onClick={() => handleEdit('patient', patient.personId)}>
+                <ActionButton 
+                  onClick={(e) => {
+                    e.stopPropagation(); // Verhindert Navigation beim Button-Click
+                    handlePatientEdit(patient.personId);
+                  }}
+                >
                   Edit
                 </ActionButton>
-                <ActionButton onClick={() => handleDelete(patient.personId)}>
+                <ActionButton 
+                  onClick={(e) => {
+                    e.stopPropagation(); // Verhindert Navigation beim Button-Click
+                    handleDelete(patient.personId);
+                  }}
+                >
                   Delete
                 </ActionButton>
               </Td>
@@ -349,6 +360,7 @@ function App() {
           <Routes>
             <Route path="/" element={<PatientsList />} />
             <Route path="/patients" element={<PatientsList />} />
+            <Route path="/patients/edit/:id" element={<PatientEdit />} /> {/* Neue Route */}
             <Route path="/doctors" element={<DoctorsList />} />
             <Route path="/treatments" element={<TreatmentsList />} />
           </Routes>
