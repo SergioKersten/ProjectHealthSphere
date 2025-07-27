@@ -25,8 +25,8 @@ public class WardController {
     private final WardManager wardManager;
 
     public WardController() {
-        // WardManager mit Auto-Save initialisieren
-        this.wardManager = new WardManager("wards.dat");
+        // WardManager mit Auto-Save initialisieren (.ser Datei wie andere Entitäten)
+        this.wardManager = new WardManager("wards.ser");
     }
 
     @GetMapping
