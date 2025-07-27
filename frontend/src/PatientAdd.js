@@ -104,39 +104,6 @@ const Button = styled.button`
   `}
 `;
 
-const TreatmentsSection = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  border: 1px solid #e9ecef;
-`;
-
-const TreatmentTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-`;
-
-const TreatmentTh = styled.th`
-  padding: 0.7rem;
-  text-align: left;
-  background-color: #f8f9fa;
-  border-bottom: 2px solid #dee2e6;
-  font-size: 0.9rem;
-`;
-
-const TreatmentTd = styled.td`
-  padding: 0.7rem;
-  border-bottom: 1px solid #dee2e6;
-  font-size: 0.9rem;
-`;
-
-const TreatmentRow = styled.tr`
-  &:hover {
-    background-color: #f8f9fa;
-  }
-`;
-
 const LoadingMessage = styled.div`
   text-align: center;
   padding: 2rem;
@@ -149,13 +116,6 @@ const ErrorMessage = styled.div`
   padding: 1rem;
   border-radius: 4px;
   margin-bottom: 1rem;
-`;
-
-const NoTreatments = styled.div`
-  text-align: center;
-  padding: 2rem;
-  color: #6c757d;
-  font-style: italic;
 `;
 
 const BackButton = styled.button`
@@ -174,7 +134,7 @@ const BackButton = styled.button`
   }
 `;
 
-function PatientEdit() {
+function PatientAdd() {
   const { id } = useParams();
   const navigate = useNavigate();
   
@@ -215,24 +175,6 @@ function PatientEdit() {
       setError('Fehler beim Laden der Patientendaten: ' + err.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadTreatments = async () => {
-    try {
-      setTreatmentsLoading(true);
-      setTreatmentsError(null);
-      // Verwende die neue API-Route für Behandlungen nach PatientID
-      const response = await fetch(`http://localhost:8080/api/treatments/patient/${id}`);
-      if (!response.ok) {
-        throw new Error('Fehler beim Laden der Behandlungen');
-      }
-      const treatmentsData = await response.json();
-      setTreatments(treatmentsData);
-    } catch (err) {
-      setTreatmentsError('Fehler beim Laden der Behandlungen: ' + err.message);
-    } finally {
-      setTreatmentsLoading(false);
     }
   };
 
@@ -288,7 +230,7 @@ function PatientEdit() {
 
       {/* Patient Information Section */}
       <PatientSection>
-        <SectionTitle>Edit Patient</SectionTitle>
+        <SectionTitle>Add Patient</SectionTitle>
         
         <FormGrid>
           <FormGroup>

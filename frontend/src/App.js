@@ -234,14 +234,6 @@ function PatientsList() {
                 <ActionButton 
                   onClick={(e) => {
                     e.stopPropagation(); // Verhindert Navigation beim Button-Click
-                    handlePatientEdit(patient.personId);
-                  }}
-                >
-                  Edit
-                </ActionButton>
-                <ActionButton 
-                  onClick={(e) => {
-                    e.stopPropagation(); // Verhindert Navigation beim Button-Click
                     handleDelete(patient.personId);
                   }}
                 >
