@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { patientAPI, treatmentAPI } from './services/api';
+import { patientAPI } from './services/api';
 
-// Styled Components für komprimierte Darstellung
+// Styled Components
 const EditContainer = styled.div`
   min-width: 500px;
   width: 900px;
@@ -64,21 +64,6 @@ const Input = styled.input`
   }
 `;
 
-const TextArea = styled.textarea`
-  padding: 0.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  resize: vertical;
-  min-height: 60px;
-  
-  &:focus {
-    outline: none;
-    border-color: #3399ff;
-    box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.25);
-  }
-`;
-
 const ButtonGroup = styled.div`
   display: flex;
   gap: 1rem;
@@ -93,7 +78,7 @@ const Button = styled.button`
   font-weight: bold;
   transition: background-color 0.2s;
   
-  ${props => props.primary ? `
+  ${props => props.primary ?`
     background-color: #3399ff;
     color: white;
     &:hover { background-color: #2980d9; }
@@ -118,6 +103,14 @@ const ErrorMessage = styled.div`
   margin-bottom: 1rem;
 `;
 
+const SuccessMessage = styled.div`
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+`;
+
 const BackButton = styled.button`
   background: none;
   border: none;
@@ -135,10 +128,9 @@ const BackButton = styled.button`
 `;
 
 function PatientAdd() {
-  const { id } = useParams();
   const navigate = useNavigate();
   
-  // Patient States
+  // Patient State für neuen Patienten
   const [patient, setPatient] = useState({
     firstname: '',
     name: '',
@@ -148,35 +140,10 @@ function PatientAdd() {
     adress: ''
   });
   
-  // Treatment States
-  const [treatments, setTreatments] = useState([]);
-  
-  // Loading States
-  const [loading, setLoading] = useState(true);
-  const [treatmentsLoading, setTreatmentsLoading] = useState(true);
+  // Loading und Error States
   const [saving, setSaving] = useState(false);
-  
-  // Error States
   const [error, setError] = useState(null);
-  const [treatmentsError, setTreatmentsError] = useState(null);
-
-  // Load patient data on component mount
-  useEffect(() => {
-    loadPatientData();
-    loadTreatments();
-  }, [id]);
-
-  const loadPatientData = async () => {
-    try {
-      setLoading(true);
-      const response = await patientAPI.getById(id);
-      setPatient(response.data);
-    } catch (err) {
-      setError('Fehler beim Laden der Patientendaten: ' + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [success, setSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -188,12 +155,25 @@ function PatientAdd() {
 
   const handleSave = async () => {
     try {
+      // Validation
+      if (!patient.firstname || !patient.name) {
+        setError('Vorname und Nachname sind Pflichtfelder!');
+        return;
+      }
+
       setSaving(true);
-      await patientAPI.update(id, patient);
-      alert('Patient erfolgreich aktualisiert!');
-      navigate('/patients');
+      setError(null);
+      
+      // API Call zum Erstellen des Patienten
+      const response = await patientAPI.create(patient);
+      
+      setSuccess(true);
+      setTimeout(() => {
+        navigate('/patients');
+      }, 1500); // Nach 1.5 Sekunden zurück zur Patientenliste
+      
     } catch (err) {
-      alert('Fehler beim Speichern: ' + err.message);
+      setError('Fehler beim Erstellen des Patienten: ' + (err.response?.data?.message || err.message));
     } finally {
       setSaving(false);
     }
@@ -203,69 +183,60 @@ function PatientAdd() {
     navigate('/patients');
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('de-DE');
-  };
-
-  if (loading) {
-    return <LoadingMessage>Loading Patientendata...</LoadingMessage>;
-  }
-
-  if (error) {
-    return (
-      <EditContainer>
-        <ErrorMessage>{error}</ErrorMessage>
-        <Button onClick={() => navigate('/patients')}>Back to Patientenlist</Button>
-      </EditContainer>
-    );
-  }
+  const isFormValid = patient.firstname.trim() && patient.name.trim();
 
   return (
     <EditContainer>
       <BackButton onClick={handleCancel}>
-        ← Back to Patientenlist
+        ← Zurück zur Patientenliste
       </BackButton>
+
+      {/* Error Message */}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+      
+      {/* Success Message */}
+      {success && <SuccessMessage>Patient erfolgreich erstellt! Weiterleitung zur Patientenliste...</SuccessMessage>}
 
       {/* Patient Information Section */}
       <PatientSection>
-        <SectionTitle>Add Patient</SectionTitle>
+        <SectionTitle>Neuen Patienten hinzufügen</SectionTitle>
         
         <FormGrid>
           <FormGroup>
-            <Label htmlFor="firstname">Firstname</Label>
+            <Label htmlFor="firstname">Vorname *</Label>
             <Input
               type="text"
               id="firstname"
               name="firstname"
               value={patient.firstname}
               onChange={handleInputChange}
-              placeholder="Vorname"
+              placeholder="Vorname eingeben"
+              required
             />
           </FormGroup>
           
           <FormGroup>
-            <Label htmlFor="name">Lastname</Label>
+            <Label htmlFor="name">Nachname *</Label>
             <Input
               type="text"
               id="name"
               name="name"
               value={patient.name}
               onChange={handleInputChange}
-              placeholder="Nachname"
+              placeholder="Nachname eingeben"
+              required
             />
           </FormGroup>
           
           <FormGroup>
-            <Label htmlFor="phonenumber">Phonenumber</Label>
+            <Label htmlFor="phonenumber">Telefonnummer</Label>
             <Input
               type="tel"
               id="phonenumber"
               name="phonenumber"
               value={patient.phonenumber}
               onChange={handleInputChange}
-              placeholder="Telefonnummer"
+              placeholder="Telefonnummer eingeben"
             />
           </FormGroup>
           
@@ -277,12 +248,12 @@ function PatientAdd() {
               name="email"
               value={patient.email}
               onChange={handleInputChange}
-              placeholder="E-Mail"
+              placeholder="E-Mail eingeben"
             />
           </FormGroup>
           
           <FormGroup>
-            <Label htmlFor="birthdate">	Date of Birth</Label>
+            <Label htmlFor="birthdate">Geburtsdatum</Label>
             <Input
               type="date"
               id="birthdate"
@@ -291,70 +262,35 @@ function PatientAdd() {
               onChange={handleInputChange}
             />
           </FormGroup>
+          
+          <FormGroup>
+            <Label htmlFor="adress">Adresse</Label>
+            <Input
+              type="text"
+              id="adress"
+              name="adress"
+              value={patient.adress}
+              onChange={handleInputChange}
+              placeholder="Adresse eingeben"
+            />
+          </FormGroup>
         </FormGrid>
-        
-        <FormGroup>
-          <Label htmlFor="adress">Adress</Label>
-          <TextArea
-            id="adress"
-            name="adress"
-            value={patient.adress}
-            onChange={handleInputChange}
-            placeholder="Adresse"
-          />
-        </FormGroup>
 
         <ButtonGroup>
-          <Button primary onClick={handleSave} disabled={saving}>
-            {saving ? 'Speichere...' : 'Save'}
+          <Button 
+            primary 
+            onClick={handleSave} 
+            disabled={saving || !isFormValid}
+          >
+            {saving ? 'Speichern...' : 'Patient erstellen'}
           </Button>
-          <Button onClick={handleCancel}>
-            Cancel
+          <Button onClick={handleCancel} disabled={saving}>
+            Abbrechen
           </Button>
         </ButtonGroup>
       </PatientSection>
-
-      {/* Treatments Section */}
-      <TreatmentsSection>
-        <SectionTitle>Treatments of {patient.firstname} {patient.name}</SectionTitle>
-        
-        {treatmentsLoading && (
-          <LoadingMessage>Loading Treatments...</LoadingMessage>
-        )}
-        
-        {treatmentsError && (
-          <ErrorMessage>{treatmentsError}</ErrorMessage>
-        )}
-        
-        {!treatmentsLoading && !treatmentsError && treatments.length === 0 && (
-          <NoTreatments>No Treatments found.</NoTreatments>
-        )}
-        
-        {!treatmentsLoading && !treatmentsError && treatments.length > 0 && (
-          <TreatmentTable>
-            <thead>
-              <tr>
-                <TreatmentTh>Treatment-ID</TreatmentTh>
-                <TreatmentTh>Data</TreatmentTh>
-                <TreatmentTh>Therapie</TreatmentTh>
-                <TreatmentTh>Doctors-ID</TreatmentTh>
-              </tr>
-            </thead>
-            <tbody>
-              {treatments.map((treatment) => (
-                <TreatmentRow key={treatment.treatmentId}>
-                  <TreatmentTd>{treatment.treatmentId}</TreatmentTd>
-                  <TreatmentTd>{formatDate(treatment.date)}</TreatmentTd>
-                  <TreatmentTd>{treatment.therapy}</TreatmentTd>
-                  <TreatmentTd>{treatment.doctorPersonId}</TreatmentTd>
-                </TreatmentRow>
-              ))}
-            </tbody>
-          </TreatmentTable>
-        )}
-      </TreatmentsSection>
     </EditContainer>
   );
 }
 
-export default PatientEdit;
+export default PatientAdd;

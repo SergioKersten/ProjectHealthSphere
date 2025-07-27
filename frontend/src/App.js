@@ -4,7 +4,8 @@ import logo from '../src/images/HealthSphereNew.png';
 import './App.css';
 import styled from 'styled-components';
 import { patientAPI, employeeAPI, treatmentAPI } from './services/api';
-import PatientEdit from './PatientEdit'; // Import der neuen Komponente
+import PatientEdit from './PatientEdit';
+import PatientAdd from './PatientAdd'; // Import der neuen PatientAdd Komponente
 
 // Styled Components (bleiben unverändert)
 const Wrapper = styled.div`
@@ -108,6 +109,10 @@ const AddButton = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  
+  &:hover {
+    background-color: #218838;
+  }
 `;
 
 // Sample Data für Doctors und Treatments (bleiben unverändert)
@@ -169,7 +174,7 @@ function PatientsList() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // Hook für Navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPatients();
@@ -187,12 +192,17 @@ function PatientsList() {
     }
   };
 
-  // Aktualisierte handleEdit Funktion für Patienten
+  // Funktion für das Bearbeiten von Patienten
   const handlePatientEdit = (personId) => {
     navigate(`/patients/edit/${personId}`);
   };
 
-  const handleDelete = async (id) => {
+  // Neue Funktion für das Hinzufügen von Patienten
+  const handlePatientAdd = () => {
+    navigate('/patients/add');
+  };
+
+  const handlePatientDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this patient?')) {
       try {
         await patientAPI.delete(id);
@@ -210,7 +220,7 @@ function PatientsList() {
     <Content>
       <Header>
         <h3>Patient List</h3>
-        <AddButton>Add Patient</AddButton>
+        <AddButton onClick={handlePatientAdd}>Add Patient</AddButton>
       </Header>
       <Table>
         <thead>
@@ -225,7 +235,7 @@ function PatientsList() {
           {patients.map((patient) => (
             <TableRow 
               key={patient.personId}
-              onClick={() => handlePatientEdit(patient.personId)} // Aktualisiert für Navigation
+              onClick={() => handlePatientEdit(patient.personId)}
             >
               <Td>{`${patient.firstname} ${patient.name}`}</Td>
               <Td>{patient.birthdate}</Td>
@@ -233,8 +243,8 @@ function PatientsList() {
               <Td>
                 <ActionButton 
                   onClick={(e) => {
-                    e.stopPropagation(); // Verhindert Navigation beim Button-Click
-                    handleDelete(patient.personId);
+                    e.stopPropagation();
+                    handlePatientDelete(patient.personId);
                   }}
                 >
                   Delete
@@ -249,11 +259,19 @@ function PatientsList() {
 }
 
 function DoctorsList() {
+  const navigate = useNavigate();
+
+  // Handler für das Hinzufügen von Ärzten (placeholder)
+  const handleDoctorAdd = () => {
+    console.log('Add Doctor functionality to be implemented');
+    // navigate('/doctors/add'); // Für zukünftige Implementierung
+  };
+
   return (
     <Content>
       <Header>
         <h3>Doctors List</h3>
-        <AddButton>Add Doctor</AddButton>
+        <AddButton onClick={handleDoctorAdd}>Add Doctor</AddButton>
       </Header>
       <Table>
         <thead>
@@ -293,11 +311,19 @@ function DoctorsList() {
 }
 
 function TreatmentsList() {
+  const navigate = useNavigate();
+
+  // Handler für das Hinzufügen von Behandlungen (placeholder)
+  const handleTreatmentAdd = () => {
+    console.log('Add Treatment functionality to be implemented');
+    // navigate('/treatments/add'); // Für zukünftige Implementierung
+  };
+
   return (
     <Content>
       <Header>
         <h3>Treatments List</h3>
-        <AddButton>Add Treatment</AddButton>
+        <AddButton onClick={handleTreatmentAdd}>Add Treatment</AddButton>
       </Header>
       <Table>
         <thead>
@@ -352,7 +378,8 @@ function App() {
           <Routes>
             <Route path="/" element={<PatientsList />} />
             <Route path="/patients" element={<PatientsList />} />
-            <Route path="/patients/edit/:id" element={<PatientEdit />} /> {/* Neue Route */}
+            <Route path="/patients/edit/:id" element={<PatientEdit />} />
+            <Route path="/patients/add" element={<PatientAdd />} /> {/* Neue Route für PatientAdd */}
             <Route path="/doctors" element={<DoctorsList />} />
             <Route path="/treatments" element={<TreatmentsList />} />
           </Routes>
