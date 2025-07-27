@@ -324,12 +324,12 @@ function EntityEdit({
       
       // Prepare data for API (apply transformations if needed)
       let entityData = { ...entity };
-      if (entityConfig.dataTransform) {
+      if (entityConfig && entityConfig.dataTransform) {
         entityData = entityConfig.dataTransform(entityData);
       }
       
       await apiService.update(id, entityData);
-      alert(entityConfig.updateSuccessMessage || `${entityType} updated successfully!`);
+      alert(entityConfig?.updateSuccessMessage || `${entityType} updated successfully!`);
       navigate(redirectPath);
     } catch (err) {
       alert('Error saving: ' + err.message);

@@ -265,7 +265,7 @@ function EntityAdd({
       
       // Prepare data for API (apply transformations if needed)
       let entityData = { ...entity };
-      if (entityConfig.dataTransform) {
+      if (entityConfig && entityConfig.dataTransform) {
         entityData = entityConfig.dataTransform(entityData);
       }
       
