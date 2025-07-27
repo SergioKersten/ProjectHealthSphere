@@ -1,11 +1,13 @@
 package com.healthsphere.manager;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.healthsphere.components.Employee;
+import com.healthsphere.components.Patient;
 import com.healthsphere.components.Person;
 import com.healthsphere.serialization.SerializationManager;
 
@@ -41,14 +43,16 @@ public class PersonManager<T extends Person> {
         }
     }
 
+    // Add a new person
     public boolean addPerson(T person) {
-        boolean result = personenSet.add(person);
+        boolean result = personenSet.add(person); // returns false if Person with same ID already exists
         if (result) {
             autoSave(); // Speichern nur bei erfolgreicher Änderung
         }
         return result;
     }
 
+    // Remove a person by ID
     public boolean deletePerson(long personId) {
         boolean result = personenSet.removeIf(p -> p.getPersonId() == personId);
         if (result) {
@@ -57,6 +61,7 @@ public class PersonManager<T extends Person> {
         return result;
     }
 
+    // Find a person by ID
     public T findById(long personId) {
         for (T person : personenSet) {
             if (person.getPersonId() == personId) {
@@ -66,20 +71,22 @@ public class PersonManager<T extends Person> {
         return null;
     }
 
+    // Return all persons
     public Set<T> getAll() {
         return personenSet;
     }
 
-    public boolean updatePerson(long personId, String newName, String newFirstname,
-            String newPhone, String newEmail, String newAdress) {
+    // Update basic person info by ID
+    public boolean updatePerson(long personId, String newName, String newFirstname, String newPhonenumber,
+            String newEmail, String newAdress) {
         T person = findById(personId);
         if (person != null) {
             if (newName != null)
                 person.setName(newName);
             if (newFirstname != null)
                 person.setFirstname(newFirstname);
-            if (newPhone != null)
-                person.setPhonenumber(newPhone);
+            if (newPhonenumber != null)
+                person.setPhonenumber(newPhonenumber);
             if (newEmail != null)
                 person.setEmail(newEmail);
             if (newAdress != null)
@@ -95,6 +102,86 @@ public class PersonManager<T extends Person> {
         T person = findById(personId);
         if (person instanceof Employee) {
             ((Employee) person).setDepartment(newDepartment);
+            autoSave(); // Speichern nach Update
+            return true;
+        }
+        return false;
+    }
+
+    // Neue Methode: Ward-Zuweisung für Patienten updaten
+    public boolean updatePatientWard(long personId, Integer wardId) {
+        T person = findById(personId);
+        if (person instanceof Patient) {
+            ((Patient) person).setWardId(wardId);
+            autoSave(); // Speichern nach Update
+            return true;
+        }
+        return false;
+    }
+
+    // Neue Methode: Ward-Zuweisung für Mitarbeiter/Ärzte updaten
+    public boolean updateEmployeeWard(long personId, Integer wardId) {
+        T person = findById(personId);
+        if (person instanceof Employee) {
+            ((Employee) person).setWardId(wardId);
+            autoSave(); // Speichern nach Update
+            return true;
+        }
+        return false;
+    }
+
+    // Neue Methode: Kombiniertes Update für Employee (Department + Ward)
+    public boolean updateEmployee(long personId, String newName, String newFirstname, String newPhonenumber,
+            String newEmail, String newAdress, String newDepartment, Integer newWardId) {
+        T person = findById(personId);
+        if (person instanceof Employee) {
+            // Update basic person fields
+            if (newName != null)
+                person.setName(newName);
+            if (newFirstname != null)
+                person.setFirstname(newFirstname);
+            if (newPhonenumber != null)
+                person.setPhonenumber(newPhonenumber);
+            if (newEmail != null)
+                person.setEmail(newEmail);
+            if (newAdress != null)
+                person.setAdress(newAdress);
+
+            // Update employee-specific fields
+            Employee employee = (Employee) person;
+            if (newDepartment != null)
+                employee.setDepartment(newDepartment);
+            if (newWardId != null)
+                employee.setWardId(newWardId);
+
+            autoSave(); // Speichern nach Update
+            return true;
+        }
+        return false;
+    }
+
+    // Neue Methode: Kombiniertes Update für Patient (Basic + Ward)
+    public boolean updatePatient(long personId, String newName, String newFirstname, String newPhonenumber,
+            String newEmail, String newAdress, Integer newWardId) {
+        T person = findById(personId);
+        if (person instanceof Patient) {
+            // Update basic person fields
+            if (newName != null)
+                person.setName(newName);
+            if (newFirstname != null)
+                person.setFirstname(newFirstname);
+            if (newPhonenumber != null)
+                person.setPhonenumber(newPhonenumber);
+            if (newEmail != null)
+                person.setEmail(newEmail);
+            if (newAdress != null)
+                person.setAdress(newAdress);
+
+            // Update patient-specific fields
+            Patient patient = (Patient) person;
+            if (newWardId != null)
+                patient.setWardId(newWardId);
+
             autoSave(); // Speichern nach Update
             return true;
         }

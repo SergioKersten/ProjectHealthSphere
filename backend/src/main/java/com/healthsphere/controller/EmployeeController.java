@@ -45,8 +45,8 @@ public class EmployeeController {
 
     @GetMapping("/department/{department}")
     public ResponseEntity<Set<Employee>> getEmployeesByDepartment(@PathVariable String department) {
-        Set<Employee> employees = employeeManager.filter(emp -> 
-            emp.getDepartment() != null && emp.getDepartment().equalsIgnoreCase(department));
+        Set<Employee> employees = employeeManager
+                .filter(emp -> emp.getDepartment() != null && emp.getDepartment().equalsIgnoreCase(department));
         return ResponseEntity.ok(employees);
     }
 
@@ -54,27 +54,28 @@ public class EmployeeController {
     public ResponseEntity<String> createEmployee(@RequestBody EmployeeRequest request) {
         try {
             Employee employee = new Employee(
-                request.getPersonId(),
-                request.getName(),
-                request.getFirstname(),
-                request.getPhonenumber(),
-                request.getEmail(),
-                request.getBirthdate(),
-                request.getAdress(),
-                request.getDepartment()
+                    request.getPersonId(),
+                    request.getName(),
+                    request.getFirstname(),
+                    request.getPhonenumber(),
+                    request.getEmail(),
+                    request.getBirthdate(),
+                    request.getAdress(),
+                    request.getDepartment(),
+                    request.getWardId() // Ward-ID hinzugefügt
             );
-            
+
             boolean added = employeeManager.addPerson(employee);
             if (added) {
                 return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Mitarbeiter erfolgreich erstellt");
+                        .body("Mitarbeiter erfolgreich erstellt");
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Mitarbeiter mit dieser ID existiert bereits");
+                        .body("Mitarbeiter mit dieser ID existiert bereits");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Fehler beim Erstellen des Mitarbeiters: " + e.getMessage());
+                    .body("Fehler beim Erstellen des Mitarbeiters: " + e.getMessage());
         }
     }
 
@@ -82,24 +83,20 @@ public class EmployeeController {
     public ResponseEntity<String> updateEmployee(
             @PathVariable long id,
             @RequestBody EmployeeUpdateRequest request) {
-        
-        Employee employee = employeeManager.findById(id);
-        if (employee != null) {
-            // Update standard Person fields
-            boolean updated = employeeManager.updatePerson(
+
+        // Verwende die neue kombinierte Update-Methode die Ward-Updates unterstützt
+        boolean updated = employeeManager.updateEmployee(
                 id,
                 request.getName(),
                 request.getFirstname(),
                 request.getPhonenumber(),
                 request.getEmail(),
-                request.getAdress()
-            );
-            
-            // Update department if provided
-            if (request.getDepartment() != null) {
-                employee.setDepartment(request.getDepartment());
-            }
-            
+                request.getAdress(),
+                request.getDepartment(),
+                request.getWardId() // Ward-ID Update hinzugefügt
+        );
+
+        if (updated) {
             return ResponseEntity.ok("Mitarbeiter erfolgreich aktualisiert");
         }
         return ResponseEntity.notFound().build();
@@ -114,7 +111,7 @@ public class EmployeeController {
         return ResponseEntity.notFound().build();
     }
 
-    // DTO Classes
+    // DTO Classes - erweitert um Ward-Unterstützung
     public static class EmployeeRequest {
         private long personId;
         private String name;
@@ -124,24 +121,80 @@ public class EmployeeController {
         private LocalDate birthdate;
         private String adress;
         private String department;
+        private Integer wardId; // Ward-ID hinzugefügt
 
         // Getters and Setters
-        public long getPersonId() { return personId; }
-        public void setPersonId(long personId) { this.personId = personId; }
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        public String getFirstname() { return firstname; }
-        public void setFirstname(String firstname) { this.firstname = firstname; }
-        public String getPhonenumber() { return phonenumber; }
-        public void setPhonenumber(String phonenumber) { this.phonenumber = phonenumber; }
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public LocalDate getBirthdate() { return birthdate; }
-        public void setBirthdate(LocalDate birthdate) { this.birthdate = birthdate; }
-        public String getAdress() { return adress; }
-        public void setAdress(String adress) { this.adress = adress; }
-        public String getDepartment() { return department; }
-        public void setDepartment(String department) { this.department = department; }
+        public long getPersonId() {
+            return personId;
+        }
+
+        public void setPersonId(long personId) {
+            this.personId = personId;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getFirstname() {
+            return firstname;
+        }
+
+        public void setFirstname(String firstname) {
+            this.firstname = firstname;
+        }
+
+        public String getPhonenumber() {
+            return phonenumber;
+        }
+
+        public void setPhonenumber(String phonenumber) {
+            this.phonenumber = phonenumber;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public LocalDate getBirthdate() {
+            return birthdate;
+        }
+
+        public void setBirthdate(LocalDate birthdate) {
+            this.birthdate = birthdate;
+        }
+
+        public String getAdress() {
+            return adress;
+        }
+
+        public void setAdress(String adress) {
+            this.adress = adress;
+        }
+
+        public String getDepartment() {
+            return department;
+        }
+
+        public void setDepartment(String department) {
+            this.department = department;
+        }
+
+        public Integer getWardId() {
+            return wardId;
+        }
+
+        public void setWardId(Integer wardId) {
+            this.wardId = wardId;
+        }
     }
 
     public static class EmployeeUpdateRequest {
@@ -151,19 +204,63 @@ public class EmployeeController {
         private String email;
         private String adress;
         private String department;
+        private Integer wardId; // Ward-ID hinzugefügt
 
         // Getters and Setters
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        public String getFirstname() { return firstname; }
-        public void setFirstname(String firstname) { this.firstname = firstname; }
-        public String getPhonenumber() { return phonenumber; }
-        public void setPhonenumber(String phonenumber) { this.phonenumber = phonenumber; }
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getAdress() { return adress; }
-        public void setAdress(String adress) { this.adress = adress; }
-        public String getDepartment() { return department; }
-        public void setDepartment(String department) { this.department = department; }
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getFirstname() {
+            return firstname;
+        }
+
+        public void setFirstname(String firstname) {
+            this.firstname = firstname;
+        }
+
+        public String getPhonenumber() {
+            return phonenumber;
+        }
+
+        public void setPhonenumber(String phonenumber) {
+            this.phonenumber = phonenumber;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getAdress() {
+            return adress;
+        }
+
+        public void setAdress(String adress) {
+            this.adress = adress;
+        }
+
+        public String getDepartment() {
+            return department;
+        }
+
+        public void setDepartment(String department) {
+            this.department = department;
+        }
+
+        public Integer getWardId() {
+            return wardId;
+        }
+
+        public void setWardId(Integer wardId) {
+            this.wardId = wardId;
+        }
     }
 }
