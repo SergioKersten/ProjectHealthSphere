@@ -1,8 +1,11 @@
 package com.healthsphere.components;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Ward {
+public class Ward implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int WardId;
     private String WardName;
     private String description;

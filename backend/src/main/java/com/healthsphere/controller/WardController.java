@@ -25,7 +25,8 @@ public class WardController {
     private final WardManager wardManager;
 
     public WardController() {
-        this.wardManager = new WardManager();
+        // WardManager mit Auto-Save initialisieren
+        this.wardManager = new WardManager("wards.dat");
     }
 
     @GetMapping
@@ -44,8 +45,7 @@ public class WardController {
 
     @GetMapping("/capacity/{minCapacity}")
     public ResponseEntity<Set<Ward>> getWardsByMinCapacity(@PathVariable int minCapacity) {
-        Set<Ward> wards = wardManager.filter(ward -> 
-            ward.getCapacity() >= minCapacity);
+        Set<Ward> wards = wardManager.filter(ward -> ward.getCapacity() >= minCapacity);
         return ResponseEntity.ok(wards);
     }
 
@@ -53,23 +53,22 @@ public class WardController {
     public ResponseEntity<String> createWard(@RequestBody WardRequest request) {
         try {
             Ward ward = new Ward(
-                request.getWardId(),
-                request.getWardName(),
-                request.getDescription(),
-                request.getCapacity()
-            );
-            
+                    request.getWardId(),
+                    request.getWardName(),
+                    request.getDescription(),
+                    request.getCapacity());
+
             boolean added = wardManager.addWard(ward);
             if (added) {
                 return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Station erfolgreich erstellt");
+                        .body("Station erfolgreich erstellt");
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Station mit dieser ID existiert bereits");
+                        .body("Station mit dieser ID existiert bereits");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Fehler beim Erstellen der Station: " + e.getMessage());
+                    .body("Fehler beim Erstellen der Station: " + e.getMessage());
         }
     }
 
@@ -77,14 +76,13 @@ public class WardController {
     public ResponseEntity<String> updateWard(
             @PathVariable int id,
             @RequestBody WardUpdateRequest request) {
-        
+
         boolean updated = wardManager.updateWard(
-            id,
-            request.getWardName(),
-            request.getDescription(),
-            request.getCapacity()
-        );
-        
+                id,
+                request.getWardName(),
+                request.getDescription(),
+                request.getCapacity());
+
         if (updated) {
             return ResponseEntity.ok("Station erfolgreich aktualisiert");
         }
@@ -108,14 +106,37 @@ public class WardController {
         private int capacity;
 
         // Getters and Setters
-        public int getWardId() { return wardId; }
-        public void setWardId(int wardId) { this.wardId = wardId; }
-        public String getWardName() { return wardName; }
-        public void setWardName(String wardName) { this.wardName = wardName; }
-        public String getDescription() { return description; }
-        public void setDescription(String description) { this.description = description; }
-        public int getCapacity() { return capacity; }
-        public void setCapacity(int capacity) { this.capacity = capacity; }
+        public int getWardId() {
+            return wardId;
+        }
+
+        public void setWardId(int wardId) {
+            this.wardId = wardId;
+        }
+
+        public String getWardName() {
+            return wardName;
+        }
+
+        public void setWardName(String wardName) {
+            this.wardName = wardName;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public int getCapacity() {
+            return capacity;
+        }
+
+        public void setCapacity(int capacity) {
+            this.capacity = capacity;
+        }
     }
 
     public static class WardUpdateRequest {
@@ -124,11 +145,28 @@ public class WardController {
         private Integer capacity;
 
         // Getters and Setters
-        public String getWardName() { return wardName; }
-        public void setWardName(String wardName) { this.wardName = wardName; }
-        public String getDescription() { return description; }
-        public void setDescription(String description) { this.description = description; }
-        public Integer getCapacity() { return capacity; }
-        public void setCapacity(Integer capacity) { this.capacity = capacity; }
+        public String getWardName() {
+            return wardName;
+        }
+
+        public void setWardName(String wardName) {
+            this.wardName = wardName;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public Integer getCapacity() {
+            return capacity;
+        }
+
+        public void setCapacity(Integer capacity) {
+            this.capacity = capacity;
+        }
     }
 }
