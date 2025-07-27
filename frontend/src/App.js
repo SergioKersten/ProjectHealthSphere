@@ -4,14 +4,20 @@ import logo from '../src/images/HealthSphereNew.png';
 import './App.css';
 import styled from 'styled-components';
 import { patientAPI, employeeAPI, treatmentAPI, wardAPI } from './services/api';
-import PatientEdit from './PatientEdit';
-import PatientAdd from './PatientAdd';
-import TreatmentEdit from './TreatmentEdit';
-import TreatmentAdd from './TreatmentAdd';
-import DoctorEdit from './DoctorEdit';
-import DoctorAdd from './DoctorAdd';
-import WardEdit from './WardEdit';
-import WardAdd from './WardAdd';
+
+// Import generic components
+import EntityAdd from './EntityAdd';
+import EntityEdit from './EntityEdit';
+
+// Import configurations
+import { 
+  patientConfig, 
+  doctorConfig, 
+  treatmentConfig, 
+  wardConfig,
+  dependentDataConfigs,
+  relatedDataConfigs
+} from './entityConfigs';
 
 // Styled Components
 const Wrapper = styled.div`
@@ -121,7 +127,122 @@ const AddButton = styled.button`
   }
 `;
 
-// Components
+// Generic Entity Components using the new generic system
+function PatientAdd() {
+  return (
+    <EntityAdd
+      entityType="patient"
+      entityConfig={patientConfig}
+      apiService={patientAPI}
+      redirectPath="/patients"
+      dependentData={{ wards: dependentDataConfigs.wards }}
+    />
+  );
+}
+
+function PatientEdit() {
+  return (
+    <EntityEdit
+      entityType="patient"
+      entityConfig={{
+        ...patientConfig,
+        title: 'Edit Patient'
+      }}
+      apiService={patientAPI}
+      redirectPath="/patients"
+      dependentData={{ wards: dependentDataConfigs.wards }}
+      relatedDataConfig={relatedDataConfigs.patientTreatments}
+    />
+  );
+}
+
+function DoctorAdd() {
+  return (
+    <EntityAdd
+      entityType="doctor"
+      entityConfig={doctorConfig}
+      apiService={employeeAPI}
+      redirectPath="/doctors"
+      dependentData={{ wards: dependentDataConfigs.wards }}
+    />
+  );
+}
+
+function DoctorEdit() {
+  return (
+    <EntityEdit
+      entityType="doctor"
+      entityConfig={{
+        ...doctorConfig,
+        title: 'Edit Doctor'
+      }}
+      apiService={employeeAPI}
+      redirectPath="/doctors"
+      dependentData={{ wards: dependentDataConfigs.wards }}
+      relatedDataConfig={relatedDataConfigs.doctorTreatments}
+    />
+  );
+}
+
+function TreatmentAdd() {
+  return (
+    <EntityAdd
+      entityType="treatment"
+      entityConfig={treatmentConfig}
+      apiService={treatmentAPI}
+      redirectPath="/treatments"
+      dependentData={{ 
+        patients: dependentDataConfigs.patients,
+        doctors: dependentDataConfigs.doctors
+      }}
+    />
+  );
+}
+
+function TreatmentEdit() {
+  return (
+    <EntityEdit
+      entityType="treatment"
+      entityConfig={{
+        ...treatmentConfig,
+        title: 'Edit Treatment'
+      }}
+      apiService={treatmentAPI}
+      redirectPath="/treatments"
+      dependentData={{ 
+        patients: dependentDataConfigs.patients,
+        doctors: dependentDataConfigs.doctors
+      }}
+    />
+  );
+}
+
+function WardAdd() {
+  return (
+    <EntityAdd
+      entityType="ward"
+      entityConfig={wardConfig}
+      apiService={wardAPI}
+      redirectPath="/wards"
+    />
+  );
+}
+
+function WardEdit() {
+  return (
+    <EntityEdit
+      entityType="ward"
+      entityConfig={{
+        ...wardConfig,
+        title: 'Edit Ward'
+      }}
+      apiService={wardAPI}
+      redirectPath="/wards"
+    />
+  );
+}
+
+// Sidebar Navigation Component
 function SidebarNav() {
   const location = useLocation();
   
@@ -155,6 +276,7 @@ function SidebarNav() {
   );
 }
 
+// List Components (these remain unchanged for now)
 function PatientsList() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -209,8 +331,9 @@ function PatientsList() {
         <thead>
           <tr>
             <Th>Name</Th>
-            <Th>Date of Birth</Th>
+            <Th>Email</Th>
             <Th>Phone</Th>
+            <Th>Birth Date</Th>
             <Th>Actions</Th>
           </tr>
         </thead>
@@ -220,9 +343,10 @@ function PatientsList() {
               key={patient.personId}
               onClick={() => handlePatientEdit(patient.personId)}
             >
-              <Td>{`${patient.firstname} ${patient.name}`}</Td>
-              <Td>{patient.birthdate}</Td>
+              <Td>{patient.firstname} {patient.name}</Td>
+              <Td>{patient.email}</Td>
               <Td>{patient.phonenumber}</Td>
+              <Td>{new Date(patient.birthdate).toLocaleDateString()}</Td>
               <Td>
                 <ActionButton 
                   onClick={(e) => {
@@ -296,6 +420,7 @@ function DoctorsList() {
           <tr>
             <Th>Name</Th>
             <Th>Department</Th>
+            <Th>Email</Th>
             <Th>Phone</Th>
             <Th>Actions</Th>
           </tr>
@@ -306,8 +431,9 @@ function DoctorsList() {
               key={doctor.personId}
               onClick={() => handleDoctorEdit(doctor.personId)}
             >
-              <Td>{`${doctor.firstname} ${doctor.name}`}</Td>
+              <Td>{doctor.firstname} {doctor.name}</Td>
               <Td>{doctor.department}</Td>
+              <Td>{doctor.email}</Td>
               <Td>{doctor.phonenumber}</Td>
               <Td>
                 <ActionButton 
@@ -368,12 +494,6 @@ function TreatmentsList() {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US');
-  };
-
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -389,8 +509,6 @@ function TreatmentsList() {
             <Th>Treatment ID</Th>
             <Th>Date</Th>
             <Th>Therapy</Th>
-            <Th>Patient ID</Th>
-            <Th>Doctor ID</Th>
             <Th>Actions</Th>
           </tr>
         </thead>
@@ -401,10 +519,8 @@ function TreatmentsList() {
               onClick={() => handleTreatmentEdit(treatment.treatmentId)}
             >
               <Td>{treatment.treatmentId}</Td>
-              <Td>{formatDate(treatment.date)}</Td>
+              <Td>{new Date(treatment.date).toLocaleDateString()}</Td>
               <Td>{treatment.therapy}</Td>
-              <Td>{treatment.patientPersonId}</Td>
-              <Td>{treatment.doctorPersonId}</Td>
               <Td>
                 <ActionButton 
                   onClick={(e) => {
@@ -511,6 +627,7 @@ function WardsList() {
   );
 }
 
+// Main App Component
 function App() {
   return (
     <Router>
