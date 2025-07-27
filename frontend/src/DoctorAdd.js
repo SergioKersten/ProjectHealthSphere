@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { employeeAPI, treatmentAPI } from './services/api';
+import { employeeAPI } from './services/api';
 
 // Styled Components
 const EditContainer = styled.div`
@@ -103,45 +103,6 @@ const Button = styled.button`
   `}
 `;
 
-const TreatmentsSection = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  border: 1px solid #e9ecef;
-`;
-
-const TreatmentTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-`;
-
-const TreatmentTh = styled.th`
-  padding: 0.7rem;
-  text-align: left;
-  background-color: #f8f9fa;
-  border-bottom: 2px solid #dee2e6;
-  font-size: 0.9rem;
-`;
-
-const TreatmentTd = styled.td`
-  padding: 0.7rem;
-  border-bottom: 1px solid #dee2e6;
-  font-size: 0.9rem;
-`;
-
-const TreatmentRow = styled.tr`
-  &:hover {
-    background-color: #f8f9fa;
-  }
-`;
-
-const LoadingMessage = styled.div`
-  text-align: center;
-  padding: 2rem;
-  color: #6c757d;
-`;
-
 const ErrorMessage = styled.div`
   background-color: #f8d7da;
   color: #721c24;
@@ -150,11 +111,12 @@ const ErrorMessage = styled.div`
   margin-bottom: 1rem;
 `;
 
-const NoTreatments = styled.div`
-  text-align: center;
-  padding: 2rem;
-  color: #6c757d;
-  font-style: italic;
+const SuccessMessage = styled.div`
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
 `;
 
 const BackButton = styled.button`
@@ -173,11 +135,10 @@ const BackButton = styled.button`
   }
 `;
 
-function DoctorEdit() {
-  const { id } = useParams();
+function DoctorAdd() {
   const navigate = useNavigate();
   
-  // Doctor State
+  // Doctor State for new doctor
   const [doctor, setDoctor] = useState({
     firstname: '',
     name: '',
@@ -189,17 +150,10 @@ function DoctorEdit() {
     salary: ''
   });
   
-  // Treatment States
-  const [treatments, setTreatments] = useState([]);
-  
-  // Loading States
-  const [loading, setLoading] = useState(true);
-  const [treatmentsLoading, setTreatmentsLoading] = useState(true);
+  // Loading and Error States
   const [saving, setSaving] = useState(false);
-  
-  // Error States
   const [error, setError] = useState(null);
-  const [treatmentsError, setTreatmentsError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   // Department options
   const departments = [
@@ -215,38 +169,6 @@ function DoctorEdit() {
     'Anesthesiology'
   ];
 
-  // Load doctor data on component mount
-  useEffect(() => {
-    loadDoctorData();
-    loadTreatments();
-  }, [id]);
-
-  const loadDoctorData = async () => {
-    try {
-      setLoading(true);
-      const response = await employeeAPI.getById(id);
-      setDoctor(response.data);
-    } catch (err) {
-      setError('Error loading doctor data: ' + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadTreatments = async () => {
-    try {
-      setTreatmentsLoading(true);
-      setTreatmentsError(null);
-      // Use the API route for treatments by doctor ID
-      const response = await treatmentAPI.getByDoctorId(id);
-      setTreatments(response.data);
-    } catch (err) {
-      setTreatmentsError('Error loading treatments: ' + err.message);
-    } finally {
-      setTreatmentsLoading(false);
-    }
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setDoctor(prev => ({
@@ -257,19 +179,31 @@ function DoctorEdit() {
 
   const handleSave = async () => {
     try {
+      // Validation
+      if (!doctor.firstname || !doctor.name || !doctor.department) {
+        setError('First name, last name, and department are required fields!');
+        return;
+      }
+
       setSaving(true);
+      setError(null);
       
       // Prepare data for API
-      const updateData = {
+      const doctorData = {
         ...doctor,
         salary: doctor.salary ? parseFloat(doctor.salary) : 0
       };
       
-      await employeeAPI.update(id, updateData);
-      alert('Doctor updated successfully!');
-      navigate('/doctors');
+      // API Call to create doctor
+      await employeeAPI.create(doctorData);
+      
+      setSuccess(true);
+      setTimeout(() => {
+        navigate('/doctors');
+      }, 1500); // Navigate back to doctor list after 1.5 seconds
+      
     } catch (err) {
-      alert('Error saving: ' + err.message);
+      setError('Error creating doctor: ' + (err.response?.data?.message || err.message));
     } finally {
       setSaving(false);
     }
@@ -279,24 +213,7 @@ function DoctorEdit() {
     navigate('/doctors');
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US');
-  };
-
-  if (loading) {
-    return <LoadingMessage>Loading doctor data...</LoadingMessage>;
-  }
-
-  if (error) {
-    return (
-      <EditContainer>
-        <ErrorMessage>{error}</ErrorMessage>
-        <Button onClick={() => navigate('/doctors')}>Back to Doctor List</Button>
-      </EditContainer>
-    );
-  }
+  const isFormValid = doctor.firstname.trim() && doctor.name.trim() && doctor.department;
 
   return (
     <EditContainer>
@@ -304,13 +221,19 @@ function DoctorEdit() {
         ← Back to Doctor List
       </BackButton>
 
+      {/* Error Message */}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+      
+      {/* Success Message */}
+      {success && <SuccessMessage>Doctor created successfully!</SuccessMessage>}
+
       {/* Doctor Information Section */}
       <DoctorSection>
-        <SectionTitle>Edit Doctor</SectionTitle>
+        <SectionTitle>Add New Doctor</SectionTitle>
         
         <FormGrid>
           <FormGroup>
-            <Label htmlFor="firstname">First Name</Label>
+            <Label htmlFor="firstname">First Name *</Label>
             <Input
               type="text"
               id="firstname"
@@ -323,7 +246,7 @@ function DoctorEdit() {
           </FormGroup>
 
           <FormGroup>
-            <Label htmlFor="name">Last Name</Label>
+            <Label htmlFor="name">Last Name *</Label>
             <Input
               type="text"
               id="name"
@@ -374,7 +297,7 @@ function DoctorEdit() {
           </FormGroup>
 
           <FormGroup>
-            <Label htmlFor="department">Department</Label>
+            <Label htmlFor="department">Department *</Label>
             <Select
               id="department"
               name="department"
@@ -424,7 +347,7 @@ function DoctorEdit() {
           <Button 
             primary 
             onClick={handleSave} 
-            disabled={saving}
+            disabled={!isFormValid || saving}
           >
             {saving ? 'Saving...' : 'Save'}
           </Button>
@@ -433,48 +356,8 @@ function DoctorEdit() {
           </Button>
         </ButtonGroup>
       </DoctorSection>
-
-      {/* Treatments Section */}
-      <TreatmentsSection>
-        <SectionTitle>Treatments by {doctor.firstname} {doctor.name}</SectionTitle>
-        
-        {treatmentsLoading && (
-          <LoadingMessage>Loading Treatments...</LoadingMessage>
-        )}
-        
-        {treatmentsError && (
-          <ErrorMessage>{treatmentsError}</ErrorMessage>
-        )}
-        
-        {!treatmentsLoading && !treatmentsError && treatments.length === 0 && (
-          <NoTreatments>No Treatments found.</NoTreatments>
-        )}
-        
-        {!treatmentsLoading && !treatmentsError && treatments.length > 0 && (
-          <TreatmentTable>
-            <thead>
-              <tr>
-                <TreatmentTh>Treatment-ID</TreatmentTh>
-                <TreatmentTh>Date</TreatmentTh>
-                <TreatmentTh>Therapy</TreatmentTh>
-                <TreatmentTh>Patient-ID</TreatmentTh>
-              </tr>
-            </thead>
-            <tbody>
-              {treatments.map((treatment) => (
-                <TreatmentRow key={treatment.treatmentId}>
-                  <TreatmentTd>{treatment.treatmentId}</TreatmentTd>
-                  <TreatmentTd>{formatDate(treatment.date)}</TreatmentTd>
-                  <TreatmentTd>{treatment.therapy}</TreatmentTd>
-                  <TreatmentTd>{treatment.patientPersonId}</TreatmentTd>
-                </TreatmentRow>
-              ))}
-            </tbody>
-          </TreatmentTable>
-        )}
-      </TreatmentsSection>
     </EditContainer>
   );
 }
 
-export default DoctorEdit;
+export default DoctorAdd;

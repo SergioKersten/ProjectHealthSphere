@@ -5,9 +5,13 @@ import './App.css';
 import styled from 'styled-components';
 import { patientAPI, employeeAPI, treatmentAPI } from './services/api';
 import PatientEdit from './PatientEdit';
-import PatientAdd from './PatientAdd'; // Import der neuen PatientAdd Komponente
+import PatientAdd from './PatientAdd';
+import TreatmentEdit from './TreatmentEdit';
+import TreatmentAdd from './TreatmentAdd';
+import DoctorEdit from './DoctorEdit';
+import DoctorAdd from './DoctorAdd';
 
-// Styled Components (bleiben unverändert)
+// Styled Components
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -115,21 +119,6 @@ const AddButton = styled.button`
   }
 `;
 
-// Sample Data für Doctors und Treatments (bleiben unverändert)
-const doctors = [
-  { id: 1, name: 'Dr. Williams', specialty: 'Kardiologie', phone: '+49 30 12345678' },
-  { id: 2, name: 'Dr. Johnson', specialty: 'Neurologie', phone: '+49 30 87654321' },
-  { id: 3, name: 'Dr. Davis', specialty: 'Orthopädie', phone: '+49 30 11223344' },
-  { id: 4, name: 'Dr. Wilson', specialty: 'Dermatologie', phone: '+49 30 55667788' },
-];
-
-const treatments = [
-  { id: 1, patient: 'John Doe', doctor: 'Dr. Williams', date: '15.06.2025', therapy: 'EKG Untersuchung' },
-  { id: 2, patient: 'Jane Smith', doctor: 'Dr. Johnson', date: '16.06.2025', therapy: 'MRT Kopf' },
-  { id: 3, patient: 'Michael Johnson', doctor: 'Dr. Davis', date: '17.06.2025', therapy: 'Röntgen Knie' },
-  { id: 4, patient: 'Emily Brown', doctor: 'Dr. Wilson', date: '18.06.2025', therapy: 'Hautuntersuchung' },
-];
-
 // Components
 function SidebarNav() {
   const location = useLocation();
@@ -158,18 +147,6 @@ function SidebarNav() {
   );
 }
 
-// Handler functions für Doctors und Treatments (bleiben unverändert)
-const handleEdit = (type, id) => {
-  console.log(`Edit ${type} with ID: ${id}`);
-  // Für doctors und treatments bleibt diese Funktion
-};
-
-const handleDelete = (type, id) => {
-  if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
-    console.log(`Delete ${type} with ID: ${id}`);
-  }
-};
-
 function PatientsList() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -192,12 +169,10 @@ function PatientsList() {
     }
   };
 
-  // Funktion für das Bearbeiten von Patienten
   const handlePatientEdit = (personId) => {
     navigate(`/patients/edit/${personId}`);
   };
 
-  // Neue Funktion für das Hinzufügen von Patienten
   const handlePatientAdd = () => {
     navigate('/patients/add');
   };
@@ -259,25 +234,60 @@ function PatientsList() {
 }
 
 function DoctorsList() {
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Handler für das Hinzufügen von Ärzten (placeholder)
-  const handleDoctorAdd = () => {
-    console.log('Add Doctor functionality to be implemented');
-    // navigate('/doctors/add'); // Für zukünftige Implementierung
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  const fetchDoctors = async () => {
+    try {
+      setLoading(true);
+      const response = await employeeAPI.getAll();
+      setDoctors(response.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleDoctorEdit = (personId) => {
+    navigate(`/doctors/edit/${personId}`);
+  };
+
+  const handleDoctorAdd = () => {
+    navigate('/doctors/add');
+  };
+
+  const handleDoctorDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this doctor?')) {
+      try {
+        await employeeAPI.delete(id);
+        fetchDoctors(); // Refresh list
+      } catch (err) {
+        alert('Error deleting doctor: ' + err.message);
+      }
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <Content>
       <Header>
-        <h3>Doctors List</h3>
+        <h3>Doctor List</h3>
         <AddButton onClick={handleDoctorAdd}>Add Doctor</AddButton>
       </Header>
       <Table>
         <thead>
           <tr>
             <Th>Name</Th>
-            <Th>Specialty</Th>
+            <Th>Department</Th>
             <Th>Phone</Th>
             <Th>Actions</Th>
           </tr>
@@ -285,18 +295,17 @@ function DoctorsList() {
         <tbody>
           {doctors.map((doctor) => (
             <TableRow 
-              key={doctor.id}
-              onClick={() => handleEdit('doctor', doctor.id)}
+              key={doctor.personId}
+              onClick={() => handleDoctorEdit(doctor.personId)}
             >
-              <Td>{doctor.name}</Td>
-              <Td>{doctor.specialty}</Td>
-              <Td>{doctor.phone}</Td>
+              <Td>{`${doctor.firstname} ${doctor.name}`}</Td>
+              <Td>{doctor.department}</Td>
+              <Td>{doctor.phonenumber}</Td>
               <Td>
                 <ActionButton 
-                  type="delete"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDelete('doctor', doctor.id);
+                    handleDoctorDelete(doctor.personId);
                   }}
                 >
                   Delete
@@ -311,46 +320,88 @@ function DoctorsList() {
 }
 
 function TreatmentsList() {
+  const [treatments, setTreatments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Handler für das Hinzufügen von Behandlungen (placeholder)
-  const handleTreatmentAdd = () => {
-    console.log('Add Treatment functionality to be implemented');
-    // navigate('/treatments/add'); // Für zukünftige Implementierung
+  useEffect(() => {
+    fetchTreatments();
+  }, []);
+
+  const fetchTreatments = async () => {
+    try {
+      setLoading(true);
+      const response = await treatmentAPI.getAll();
+      setTreatments(response.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleTreatmentEdit = (treatmentId) => {
+    navigate(`/treatments/edit/${treatmentId}`);
+  };
+
+  const handleTreatmentAdd = () => {
+    navigate('/treatments/add');
+  };
+
+  const handleTreatmentDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this treatment?')) {
+      try {
+        await treatmentAPI.delete(id);
+        fetchTreatments(); // Refresh list
+      } catch (err) {
+        alert('Error deleting treatment: ' + err.message);
+      }
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US');
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <Content>
       <Header>
-        <h3>Treatments List</h3>
+        <h3>Treatment List</h3>
         <AddButton onClick={handleTreatmentAdd}>Add Treatment</AddButton>
       </Header>
       <Table>
         <thead>
           <tr>
-            <Th>Patient</Th>
-            <Th>Doctor</Th>
+            <Th>Treatment ID</Th>
             <Th>Date</Th>
             <Th>Therapy</Th>
+            <Th>Patient ID</Th>
+            <Th>Doctor ID</Th>
             <Th>Actions</Th>
           </tr>
         </thead>
         <tbody>
           {treatments.map((treatment) => (
             <TableRow 
-              key={treatment.id}
-              onClick={() => handleEdit('treatment', treatment.id)}
+              key={treatment.treatmentId}
+              onClick={() => handleTreatmentEdit(treatment.treatmentId)}
             >
-              <Td>{treatment.patient}</Td>
-              <Td>{treatment.doctor}</Td>
-              <Td>{treatment.date}</Td>
+              <Td>{treatment.treatmentId}</Td>
+              <Td>{formatDate(treatment.date)}</Td>
               <Td>{treatment.therapy}</Td>
+              <Td>{treatment.patientPersonId}</Td>
+              <Td>{treatment.doctorPersonId}</Td>
               <Td>
                 <ActionButton 
-                  type="delete"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDelete('treatment', treatment.id);
+                    handleTreatmentDelete(treatment.treatmentId);
                   }}
                 >
                   Delete
@@ -370,7 +421,7 @@ function App() {
       <Wrapper>
         <Header1>
           <ImageWrapper>
-            <img src={logo} height={100} alt="HealthSphere Logo" />
+            <img src={logo} className="App-logo" alt="logo" />
           </ImageWrapper>
         </Header1>
         <Container>
@@ -378,10 +429,14 @@ function App() {
           <Routes>
             <Route path="/" element={<PatientsList />} />
             <Route path="/patients" element={<PatientsList />} />
+            <Route path="/patients/add" element={<PatientAdd />} />
             <Route path="/patients/edit/:id" element={<PatientEdit />} />
-            <Route path="/patients/add" element={<PatientAdd />} /> {/* Neue Route für PatientAdd */}
             <Route path="/doctors" element={<DoctorsList />} />
+            <Route path="/doctors/add" element={<DoctorAdd />} />
+            <Route path="/doctors/edit/:id" element={<DoctorEdit />} />
             <Route path="/treatments" element={<TreatmentsList />} />
+            <Route path="/treatments/add" element={<TreatmentAdd />} />
+            <Route path="/treatments/edit/:id" element={<TreatmentEdit />} />
           </Routes>
         </Container>
       </Wrapper>
