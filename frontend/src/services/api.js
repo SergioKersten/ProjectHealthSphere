@@ -38,13 +38,23 @@ export const employeeAPI = {
 export const treatmentAPI = {
   getAll: () => api.get('/treatments'),
   getById: (id) => api.get(`/treatments/${id}`),
-  getByPatientId: (patientId) => api.get(`/treatments/patient/${patientId}`), // Neue Funktion
+  getByPatientId: (patientId) => api.get(`/treatments/patient/${patientId}`),
   getByDoctorId: (doctorId) => api.get(`/treatments/doctor/${doctorId}`),
   getByDate: (date) => api.get(`/treatments/date/${date}`),
   create: (treatment) => api.post('/treatments', treatment),
   update: (id, treatment) => api.put(`/treatments/${id}`, treatment),
   updateTherapy: (id, therapy) => api.put(`/treatments/${id}/therapy`, therapy),
   delete: (id) => api.delete(`/treatments/${id}`),
+};
+
+// Ward API calls
+export const wardAPI = {
+  getAll: () => api.get('/wards'),
+  getById: (id) => api.get(`/wards/${id}`),
+  getByMinCapacity: (minCapacity) => api.get(`/wards/capacity/${minCapacity}`),
+  create: (ward) => api.post('/wards', ward),
+  update: (id, ward) => api.put(`/wards/${id}`, ward),
+  delete: (id) => api.delete(`/wards/${id}`),
 };
 
 export default api;

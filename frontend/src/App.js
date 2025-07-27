@@ -3,13 +3,15 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate 
 import logo from '../src/images/HealthSphereNew.png';
 import './App.css';
 import styled from 'styled-components';
-import { patientAPI, employeeAPI, treatmentAPI } from './services/api';
+import { patientAPI, employeeAPI, treatmentAPI, wardAPI } from './services/api';
 import PatientEdit from './PatientEdit';
 import PatientAdd from './PatientAdd';
 import TreatmentEdit from './TreatmentEdit';
 import TreatmentAdd from './TreatmentAdd';
 import DoctorEdit from './DoctorEdit';
 import DoctorAdd from './DoctorAdd';
+import WardEdit from './WardEdit';
+import WardAdd from './WardAdd';
 
 // Styled Components
 const Wrapper = styled.div`
@@ -142,6 +144,12 @@ function SidebarNav() {
         $active={location.pathname === '/treatments'}
       >
         Treatments
+      </SidebarItem>
+      <SidebarItem 
+        to="/wards" 
+        $active={location.pathname === '/wards'}
+      >
+        Wards
       </SidebarItem>
     </SidebarContainer>
   );
@@ -415,6 +423,94 @@ function TreatmentsList() {
   );
 }
 
+function WardsList() {
+  const [wards, setWards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchWards();
+  }, []);
+
+  const fetchWards = async () => {
+    try {
+      setLoading(true);
+      const response = await wardAPI.getAll();
+      setWards(response.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleWardEdit = (wardId) => {
+    navigate(`/wards/edit/${wardId}`);
+  };
+
+  const handleWardAdd = () => {
+    navigate('/wards/add');
+  };
+
+  const handleWardDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this ward?')) {
+      try {
+        await wardAPI.delete(id);
+        fetchWards(); // Refresh list
+      } catch (err) {
+        alert('Error deleting ward: ' + err.message);
+      }
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <Content>
+      <Header>
+        <h3>Ward List</h3>
+        <AddButton onClick={handleWardAdd}>Add Ward</AddButton>
+      </Header>
+      <Table>
+        <thead>
+          <tr>
+            <Th>Ward ID</Th>
+            <Th>Ward Name</Th>
+            <Th>Capacity</Th>
+            <Th>Description</Th>
+            <Th>Actions</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {wards.map((ward) => (
+            <TableRow 
+              key={ward.wardId}
+              onClick={() => handleWardEdit(ward.wardId)}
+            >
+              <Td>{ward.wardId}</Td>
+              <Td>{ward.wardName}</Td>
+              <Td>{ward.capacity}</Td>
+              <Td>{ward.description}</Td>
+              <Td>
+                <ActionButton 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleWardDelete(ward.wardId);
+                  }}
+                >
+                  Delete
+                </ActionButton>
+              </Td>
+            </TableRow>
+          ))}
+        </tbody>
+      </Table>
+    </Content>
+  );
+}
+
 function App() {
   return (
     <Router>
@@ -437,6 +533,9 @@ function App() {
             <Route path="/treatments" element={<TreatmentsList />} />
             <Route path="/treatments/add" element={<TreatmentAdd />} />
             <Route path="/treatments/edit/:id" element={<TreatmentEdit />} />
+            <Route path="/wards" element={<WardsList />} />
+            <Route path="/wards/add" element={<WardAdd />} />
+            <Route path="/wards/edit/:id" element={<WardEdit />} />
           </Routes>
         </Container>
       </Wrapper>
