@@ -5,11 +5,10 @@ import './App.css';
 import styled from 'styled-components';
 import { patientAPI, employeeAPI, treatmentAPI, wardAPI } from './services/api';
 
-
 import EntityAdd from './EntityAdd';
 import EntityEdit from './EntityEdit';
 import DoctorDashboard from './DoctorDashboard';
-
+import SecretaryDashboard from './SecretaryDashboard'; // Neuer Import
 
 // Import configurations
 import { 
@@ -34,13 +33,13 @@ const Header1 = styled.div`
 `;
 
 const ImageWrapper = styled.div`
-height: 200px;
-width: auto;
+  height: 200px;
+  width: auto;
 `;
 
-const StyledImg= styled.img`
-height: 200px;
-width: auto;
+const StyledImg = styled.img`
+  height: 200px;
+  width: auto;
 `;
 
 const Container = styled.div`
@@ -49,29 +48,51 @@ const Container = styled.div`
 `;
 
 const SidebarContainer = styled.div`
-  width: 200px;
+  width: 250px; /* Erweitert für längere Labels */
   background-color: #f1f1f1;
   padding: 1rem;
   min-height: 100vh;
+  border-right: 2px solid #e9ecef;
 `;
 
 const SidebarItem = styled(Link)`
   display: block;
   margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
   font-weight: ${({ $active }) => ($active ? 'bold' : 'normal')};
   color: ${({ $active }) => ($active ? '#007bff' : '#000')};
+  background-color: ${({ $active }) => ($active ? '#e3f2fd' : 'transparent')};
   text-decoration: none;
   cursor: pointer;
+  border-radius: 4px;
+  border-left: ${({ $active }) => ($active ? '4px solid #007bff' : '4px solid transparent')};
+  transition: all 0.3s ease;
   
   &:hover {
     color: #007bff;
+    background-color: #f8f9fa;
+    transform: translateX(2px);
   }
+`;
+
+const SidebarSection = styled.div`
+  margin-bottom: 2rem;
+`;
+
+const SidebarSectionTitle = styled.h4`
+  color: #6c757d;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 0.5rem;
 `;
 
 const Content = styled.div`
   flex: 1;
   padding: 0 2rem 0 2rem;
-  max-width: 800px;
+  max-width: ${({ $fullWidth }) => ($fullWidth ? 'none' : '800px')};
 `;
 
 const Header = styled.div`
@@ -110,13 +131,13 @@ const TableRow = styled.tr`
 `;
 
 const ActionButton = styled.button`
-  background-color: ${({ type }) => (type === 'edit' ? '#007bff' : '#dc3545')};
-  color: white;
+  background-color: ${({ type }) => (type === 'edit' ? '#ffc107' : '#dc3545')};
+  color: ${({ type }) => (type === 'edit' ? '#212529' : 'white')};
   border: none;
+  padding: 0.375rem 0.75rem;
   border-radius: 4px;
-  padding: 0.4rem 0.6rem;
-  margin-left: 5px;
   cursor: pointer;
+  margin-right: 0.5rem;
   
   &:hover {
     opacity: 0.8;
@@ -126,9 +147,8 @@ const ActionButton = styled.button`
 const AddButton = styled.button`
   background-color: #28a745;
   color: white;
-  padding: 0.5rem 0.9rem;
-  margin-right: 1rem;
   border: none;
+  padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
   
@@ -137,7 +157,7 @@ const AddButton = styled.button`
   }
 `;
 
-// Generic Entity Components using the new generic system
+// Component Functions
 function PatientAdd() {
   return (
     <EntityAdd
@@ -146,6 +166,7 @@ function PatientAdd() {
       apiService={patientAPI}
       redirectPath="/patients"
       dependentData={{ wards: dependentDataConfigs.wards }}
+      relatedDataConfig={relatedDataConfigs.patientTreatments}
     />
   );
 }
@@ -174,6 +195,7 @@ function DoctorAdd() {
       apiService={employeeAPI}
       redirectPath="/doctors"
       dependentData={{ wards: dependentDataConfigs.wards }}
+      relatedDataConfig={relatedDataConfigs.doctorTreatments}
     />
   );
 }
@@ -258,41 +280,55 @@ function SidebarNav() {
   
   return (
     <SidebarContainer>
-      <SidebarItem 
-        to="/patients" 
-        $active={location.pathname === '/patients' || location.pathname === '/'}
-      >
-        Patients
-      </SidebarItem>
-      <SidebarItem 
-        to="/doctors" 
-        $active={location.pathname === '/doctors'}
-      >
-        Doctors
-      </SidebarItem>
-      <SidebarItem 
-        to="/doctor-dashboard" 
-        $active={location.pathname === '/doctor-dashboard'}
-      >
-        Arzt Dashboard
-      </SidebarItem>
-      <SidebarItem 
-        to="/treatments" 
-        $active={location.pathname === '/treatments'}
-      >
-        Treatments
-      </SidebarItem>
-      <SidebarItem 
-        to="/wards" 
-        $active={location.pathname === '/wards'}
-      >
-        Wards
-      </SidebarItem>
+      <SidebarSection>
+        <SidebarSectionTitle>Dashboards</SidebarSectionTitle>
+        <SidebarItem 
+          to="/secretary-dashboard" 
+          $active={location.pathname === '/secretary-dashboard'}
+        >
+          🏥 Sekretariat Dashboard
+        </SidebarItem>
+        <SidebarItem 
+          to="/doctor-dashboard" 
+          $active={location.pathname === '/doctor-dashboard'}
+        >
+          👨‍⚕️ Arzt Dashboard
+        </SidebarItem>
+      </SidebarSection>
+
+      <SidebarSection>
+        <SidebarSectionTitle>Entitäten verwalten</SidebarSectionTitle>
+        <SidebarItem 
+          to="/patients" 
+          $active={location.pathname === '/patients' || location.pathname === '/' || 
+                   location.pathname.startsWith('/patients/')}
+        >
+          👥 Patienten
+        </SidebarItem>
+        <SidebarItem 
+          to="/doctors" 
+          $active={location.pathname === '/doctors' || location.pathname.startsWith('/doctors/')}
+        >
+          👨‍⚕️ Ärzte
+        </SidebarItem>
+        <SidebarItem 
+          to="/treatments" 
+          $active={location.pathname === '/treatments' || location.pathname.startsWith('/treatments/')}
+        >
+          💊 Behandlungen
+        </SidebarItem>
+        <SidebarItem 
+          to="/wards" 
+          $active={location.pathname === '/wards' || location.pathname.startsWith('/wards/')}
+        >
+          🏥 Stationen
+        </SidebarItem>
+      </SidebarSection>
     </SidebarContainer>
   );
 }
 
-// List Components (these remain unchanged for now)
+// List Components
 function PatientsList() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -327,7 +363,7 @@ function PatientsList() {
     if (window.confirm('Are you sure you want to delete this patient?')) {
       try {
         await patientAPI.delete(id);
-        fetchPatients(); // Refresh list
+        fetchPatients();
       } catch (err) {
         alert('Error deleting patient: ' + err.message);
       }
@@ -346,10 +382,11 @@ function PatientsList() {
       <Table>
         <thead>
           <tr>
-            <Th>Name</Th>
-            <Th>Email</Th>
+            <Th>ID</Th>
+            <Th>First Name</Th>
+            <Th>Last Name</Th>
             <Th>Phone</Th>
-            <Th>Birth Date</Th>
+            <Th>Email</Th>
             <Th>Actions</Th>
           </tr>
         </thead>
@@ -359,11 +396,21 @@ function PatientsList() {
               key={patient.personId}
               onClick={() => handlePatientEdit(patient.personId)}
             >
-              <Td>{patient.firstname} {patient.name}</Td>
-              <Td>{patient.email}</Td>
+              <Td>{patient.personId}</Td>
+              <Td>{patient.firstname}</Td>
+              <Td>{patient.name}</Td>
               <Td>{patient.phonenumber}</Td>
-              <Td>{new Date(patient.birthdate).toLocaleDateString()}</Td>
+              <Td>{patient.email}</Td>
               <Td>
+                <ActionButton 
+                  type="edit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePatientEdit(patient.personId);
+                  }}
+                >
+                  Edit
+                </ActionButton>
                 <ActionButton 
                   onClick={(e) => {
                     e.stopPropagation();
@@ -415,7 +462,7 @@ function DoctorsList() {
     if (window.confirm('Are you sure you want to delete this doctor?')) {
       try {
         await employeeAPI.delete(id);
-        fetchDoctors(); // Refresh list
+        fetchDoctors();
       } catch (err) {
         alert('Error deleting doctor: ' + err.message);
       }
@@ -434,10 +481,12 @@ function DoctorsList() {
       <Table>
         <thead>
           <tr>
-            <Th>Name</Th>
+            <Th>ID</Th>
+            <Th>First Name</Th>
+            <Th>Last Name</Th>
             <Th>Department</Th>
-            <Th>Email</Th>
             <Th>Phone</Th>
+            <Th>Email</Th>
             <Th>Actions</Th>
           </tr>
         </thead>
@@ -447,11 +496,22 @@ function DoctorsList() {
               key={doctor.personId}
               onClick={() => handleDoctorEdit(doctor.personId)}
             >
-              <Td>{doctor.firstname} {doctor.name}</Td>
+              <Td>{doctor.personId}</Td>
+              <Td>{doctor.firstname}</Td>
+              <Td>{doctor.name}</Td>
               <Td>{doctor.department}</Td>
-              <Td>{doctor.email}</Td>
               <Td>{doctor.phonenumber}</Td>
+              <Td>{doctor.email}</Td>
               <Td>
+                <ActionButton 
+                  type="edit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDoctorEdit(doctor.personId);
+                  }}
+                >
+                  Edit
+                </ActionButton>
                 <ActionButton 
                   onClick={(e) => {
                     e.stopPropagation();
@@ -503,7 +563,7 @@ function TreatmentsList() {
     if (window.confirm('Are you sure you want to delete this treatment?')) {
       try {
         await treatmentAPI.delete(id);
-        fetchTreatments(); // Refresh list
+        fetchTreatments();
       } catch (err) {
         alert('Error deleting treatment: ' + err.message);
       }
@@ -524,6 +584,8 @@ function TreatmentsList() {
           <tr>
             <Th>Treatment ID</Th>
             <Th>Date</Th>
+            <Th>Patient ID</Th>
+            <Th>Doctor ID</Th>
             <Th>Therapy</Th>
             <Th>Actions</Th>
           </tr>
@@ -535,9 +597,20 @@ function TreatmentsList() {
               onClick={() => handleTreatmentEdit(treatment.treatmentId)}
             >
               <Td>{treatment.treatmentId}</Td>
-              <Td>{new Date(treatment.date).toLocaleDateString()}</Td>
+              <Td>{treatment.date ? new Date(treatment.date).toLocaleDateString() : '-'}</Td>
+              <Td>{treatment.patientPersonId}</Td>
+              <Td>{treatment.doctorPersonId}</Td>
               <Td>{treatment.therapy}</Td>
               <Td>
+                <ActionButton 
+                  type="edit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleTreatmentEdit(treatment.treatmentId);
+                  }}
+                >
+                  Edit
+                </ActionButton>
                 <ActionButton 
                   onClick={(e) => {
                     e.stopPropagation();
@@ -589,7 +662,7 @@ function WardsList() {
     if (window.confirm('Are you sure you want to delete this ward?')) {
       try {
         await wardAPI.delete(id);
-        fetchWards(); // Refresh list
+        fetchWards();
       } catch (err) {
         alert('Error deleting ward: ' + err.message);
       }
@@ -627,6 +700,15 @@ function WardsList() {
               <Td>{ward.description}</Td>
               <Td>
                 <ActionButton 
+                  type="edit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleWardEdit(ward.wardId);
+                  }}
+                >
+                  Edit
+                </ActionButton>
+                <ActionButton 
                   onClick={(e) => {
                     e.stopPropagation();
                     handleWardDelete(ward.wardId);
@@ -656,19 +738,33 @@ function App() {
         <Container>
           <SidebarNav />
           <Routes>
-            <Route path="/" element={<PatientsList />} />
+            {/* Default route - redirect to Secretary Dashboard */}
+            <Route path="/" element={<SecretaryDashboard />} />
+            
+            {/* Dashboard Routes */}
+            <Route path="/secretary-dashboard" element={
+              <Content $fullWidth={true}>
+                <SecretaryDashboard />
+              </Content>
+            } />
+            <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+
+            {/* Patient Routes */}
             <Route path="/patients" element={<PatientsList />} />
             <Route path="/patients/add" element={<PatientAdd />} />
             <Route path="/patients/edit/:id" element={<PatientEdit />} />
+
+            {/* Doctor Routes */}
             <Route path="/doctors" element={<DoctorsList />} />
             <Route path="/doctors/add" element={<DoctorAdd />} />
             <Route path="/doctors/edit/:id" element={<DoctorEdit />} />
 
-<Route path="/doctor-dashboard" element={<DoctorDashboard />} />
-
+            {/* Treatment Routes */}
             <Route path="/treatments" element={<TreatmentsList />} />
             <Route path="/treatments/add" element={<TreatmentAdd />} />
             <Route path="/treatments/edit/:id" element={<TreatmentEdit />} />
+
+            {/* Ward Routes */}
             <Route path="/wards" element={<WardsList />} />
             <Route path="/wards/add" element={<WardAdd />} />
             <Route path="/wards/edit/:id" element={<WardEdit />} />
