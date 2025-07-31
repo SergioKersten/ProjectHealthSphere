@@ -218,17 +218,6 @@ const TherapyDescription = styled.div`
   border-left: 3px solid #28a745;
 `;
 
-const UpdateIndicator = styled.div`
-  background-color: #28a745;
-  color: white;
-  padding: 0.3rem 0.75rem;
-  border-radius: 15px;
-  font-size: 0.75rem;
-  display: inline-block;
-  margin-top: 0.5rem;
-  font-weight: 500;
-`;
-
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem;
@@ -488,6 +477,8 @@ function DoctorDashboard() {
       return treatmentDate === todayString;
     });
   };
+
+  const refreshData = async () => {
     await loadDoctors();
     await loadPatients();
     if (selectedDoctorId) {
@@ -626,9 +617,7 @@ function DoctorDashboard() {
                       }) : 'Kein Datum'}
                     </TreatmentDate>
                     
-                    <TreatmentType>
-                      Behandlungs-ID: {treatment.treatmentId}
-                    </TreatmentType>
+                    
                     
                     {treatment.therapy && (
                       <TherapyDescription>

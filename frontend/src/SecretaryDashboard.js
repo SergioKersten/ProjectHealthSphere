@@ -224,6 +224,7 @@ const TableCell = styled.td`
   padding: 1rem;
   border-bottom: 1px solid #dee2e6;
   vertical-align: middle;
+  max-width: 300px;
 `;
 
 const StatusBadge = styled.span`
@@ -612,7 +613,10 @@ function SecretaryDashboard() {
     therapy: '',
     patientPersonId: '',
     doctorPersonId: '',
-    treatmentId: ''
+    wardId: '',
+    wardName: '',
+    capacity: '',
+    description: ''
   });
 
   // Load initial data
@@ -696,7 +700,10 @@ function SecretaryDashboard() {
       therapy: '',
       patientPersonId: '',
       doctorPersonId: '',
-      treatmentId: ''
+      treatmentId: '',
+      wardName: '',
+      capacity: '',
+      description: ''
     });
   };
 
@@ -750,6 +757,9 @@ function SecretaryDashboard() {
         data.treatmentId = data.treatmentId ? parseInt(data.treatmentId) : undefined;
         data.patientPersonId = parseInt(data.patientPersonId);
         data.doctorPersonId = parseInt(data.doctorPersonId);
+      } else if (modalType === 'ward') {
+        data.wardId = data.wardId ? parseInt(data.wardId) : undefined;
+        data.capacity = parseInt(data.capacity);
       }
       
       if (modalMode === 'add') {
@@ -759,18 +769,22 @@ function SecretaryDashboard() {
           response = await employeeAPI.create(data);
         } else if (modalType === 'treatment') {
           response = await treatmentAPI.create(data);
+        } else if (modalType === 'ward') {
+          response = await wardAPI.create(data);
         }
-        setSuccess(`${modalType === 'patient' ? 'Patient' : modalType === 'doctor' ? 'Arzt' : 'Behandlung'} erfolgreich hinzugefügt!`);
+        setSuccess(`${modalType === 'patient' ? 'Patient' : modalType === 'doctor' ? 'Arzt' : modalType === 'treatment' ? 'Behandlung' : 'Station'} erfolgreich hinzugefügt!`);
       } else if (modalMode === 'edit') {
-        const id = editingItem.personId || editingItem.treatmentId;
+        const id = editingItem.personId || editingItem.treatmentId || editingItem.wardId;
         if (modalType === 'patient') {
           response = await patientAPI.update(id, data);
         } else if (modalType === 'doctor') {
           response = await employeeAPI.update(id, data);
         } else if (modalType === 'treatment') {
           response = await treatmentAPI.update(id, data);
+        } else if (modalType === 'ward') {
+          response = await wardAPI.update(id, data);
         }
-        setSuccess(`${modalType === 'patient' ? 'Patient' : modalType === 'doctor' ? 'Arzt' : 'Behandlung'} erfolgreich aktualisiert!`);
+        setSuccess(`${modalType === 'patient' ? 'Patient' : modalType === 'doctor' ? 'Arzt' : modalType === 'treatment' ? 'Behandlung' : 'Station'} erfolgreich aktualisiert!`);
       }
       
       await loadAllData();
@@ -783,7 +797,7 @@ function SecretaryDashboard() {
   };
 
   const handleDelete = async (id, type) => {
-    if (!window.confirm(`Sind Sie sicher, dass Sie diesen ${type === 'patient' ? 'Patienten' : type === 'doctor' ? 'Arzt' : 'Behandlung'} löschen möchten?`)) {
+    if (!window.confirm(`Sind Sie sicher, dass Sie diese ${type === 'patient' ? 'Patient' : type === 'doctor' ? 'Arzt' : type === 'treatment' ? 'Behandlung' : 'Station'} löschen möchten?`)) {
       return;
     }
     
@@ -795,9 +809,11 @@ function SecretaryDashboard() {
         await employeeAPI.delete(id);
       } else if (type === 'treatment') {
         await treatmentAPI.delete(id);
+      } else if (type === 'ward') {
+        await wardAPI.delete(id);
       }
       
-      setSuccess(`${type === 'patient' ? 'Patient' : type === 'doctor' ? 'Arzt' : 'Behandlung'} erfolgreich gelöscht!`);
+      setSuccess(`${type === 'patient' ? 'Patient' : type === 'doctor' ? 'Arzt' : type === 'treatment' ? 'Behandlung' : 'Station'} erfolgreich gelöscht!`);
       await loadAllData();
     } catch (err) {
       setError('Fehler beim Löschen: ' + err.message);
@@ -886,6 +902,9 @@ function SecretaryDashboard() {
         <ActionButton $variant="success" onClick={() => openModal('treatment', 'add')}>
           Neue Behandlung hinzufügen
         </ActionButton>
+        <ActionButton $variant="success" onClick={() => openModal('ward', 'add')}>
+          Neue Station hinzufügen
+        </ActionButton>
         <ActionButton onClick={loadAllData} disabled={loading}>
           Daten aktualisieren
         </ActionButton>
@@ -960,6 +979,67 @@ function SecretaryDashboard() {
                   <ActionButton 
                     $variant="danger"
                     onClick={() => handleDelete(patient.personId, 'patient')}
+                  >
+                    Löschen
+                  </ActionButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </tbody>
+        </DataTable>
+      </div>
+    );
+  };
+
+  const renderWards = () => {
+    const filteredWards = getFilteredData(wards, 'ward');
+    
+    return (
+      <div>
+        <ActionButtonsRow>
+          <ActionButton $variant="success" onClick={() => openModal('ward', 'add')}>
+            Neue Station hinzufügen
+          </ActionButton>
+        </ActionButtonsRow>
+        
+        <FilterSection>
+          <FilterRow>
+            <FilterInput
+              type="text"
+              placeholder="Suche nach Stationsname..."
+              value={filters.searchTerm}
+              onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
+            />
+            <ClearButton onClick={clearFilters}>Filter zurücksetzen</ClearButton>
+          </FilterRow>
+        </FilterSection>
+
+        <DataTable>
+          <thead>
+            <tr>
+              <TableHeader>Stationsname</TableHeader>
+              <TableHeader>Kapazität</TableHeader>
+              <TableHeader>Beschreibung</TableHeader>
+              <TableHeader>Aktionen</TableHeader>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredWards.map(ward => (
+              <TableRow key={ward.wardId}>
+                <TableCell>{ward.wardName}</TableCell>
+                <TableCell>{ward.capacity}</TableCell>
+                <TableCell>{ward.description || '-'}</TableCell>
+                <TableCell>
+                  <ActionButton 
+                    $variant="warning"
+                    onClick={() => openModal('ward', 'edit', ward)}
+                    style={{marginRight: '0.5rem'}}
+                  >
+                    Bearbeiten
+                  </ActionButton>
+                  <ActionButton 
+                    $variant="danger"
+                    onClick={() => handleDelete(ward.wardId, 'ward')}
                   >
                     Löschen
                   </ActionButton>
@@ -1436,7 +1516,8 @@ function SecretaryDashboard() {
           <ModalHeader>
             {modalMode === 'add' ? 'Hinzufügen' : 'Bearbeiten'} - {
               modalType === 'patient' ? 'Patient' :
-              modalType === 'doctor' ? 'Arzt' : 'Behandlung'
+              modalType === 'doctor' ? 'Arzt' : 
+              modalType === 'treatment' ? 'Behandlung' : 'Station'
             }
           </ModalHeader>
           
@@ -1506,6 +1587,49 @@ function SecretaryDashboard() {
                       </option>
                     ))}
                   </FormSelect>
+                </FormGroup>
+              </>
+            )}
+
+            {modalType === 'ward' && (
+              <>
+                {modalMode === 'edit' && (
+                  <FormGroup>
+                    <FormLabel>Stations-ID</FormLabel>
+                    <FormInput
+                      type="number"
+                      value={formData.wardId}
+                      onChange={(e) => handleFormChange('wardId', e.target.value)}
+                      disabled
+                    />
+                  </FormGroup>
+                )}
+                <FormGroup>
+                  <FormLabel>Stationsname *</FormLabel>
+                  <FormInput
+                    type="text"
+                    value={formData.wardName}
+                    onChange={(e) => handleFormChange('wardName', e.target.value)}
+                    required
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <FormLabel>Kapazität *</FormLabel>
+                  <FormInput
+                    type="number"
+                    min="1"
+                    value={formData.capacity}
+                    onChange={(e) => handleFormChange('capacity', e.target.value)}
+                    required
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <FormLabel>Beschreibung</FormLabel>
+                  <FormTextarea
+                    value={formData.description}
+                    onChange={(e) => handleFormChange('description', e.target.value)}
+                    placeholder="Beschreibung der Station eingeben..."
+                  />
                 </FormGroup>
               </>
             )}
@@ -1703,6 +1827,12 @@ function SecretaryDashboard() {
         >
           Behandlungen
         </Tab>
+        <Tab 
+          $active={activeTab === 'wards'} 
+          onClick={() => setActiveTab('wards')}
+        >
+          Stationen
+        </Tab>
       </TabsContainer>
 
       <ContentArea>
@@ -1710,6 +1840,7 @@ function SecretaryDashboard() {
         {activeTab === 'patients' && renderPatients()}
         {activeTab === 'doctors' && renderDoctors()}
         {activeTab === 'treatments' && renderTreatments()}
+        {activeTab === 'wards' && renderWards()}
       </ContentArea>
 
       {renderModal()}
