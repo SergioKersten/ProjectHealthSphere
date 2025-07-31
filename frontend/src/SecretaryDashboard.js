@@ -196,12 +196,11 @@ const DataTable = styled.table`
 `;
 
 const TableHeader = styled.th`
-  background-color: #343a40;
+  background-color: #007bff;
   color: white;
   padding: 1rem;
   text-align: left;
   font-weight: 600;
-  border-bottom: 2px solid #28a745;
 `;
 
 const TableRow = styled.tr`

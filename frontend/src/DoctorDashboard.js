@@ -2,31 +2,56 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { employeeAPI, treatmentAPI, patientAPI } from './services/api';
 
-// Styled Components
+// Styled Components - Adapted from SecretaryDashboard
 const DashboardContainer = styled.div`
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
+  width: 100%;
 `;
 
 const HeaderSection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  background-color: #3399ff;
+  background-color: #28a745; /* Changed to green */
   color: white;
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 6px;
+  margin-bottom: 2rem;
+  text-align: center;
+`;
+
+const DashboardTitle = styled.h1`
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
+`;
+
+const DashboardSubtitle = styled.p`
+  margin: 0.5rem 0 0 0;
+  font-size: 1.1rem;
+  opacity: 0.9;
+`;
+
+const DoctorSelectorSection = styled.div`
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+  border: 1px solid #e9ecef;
 `;
 
 const DoctorSelector = styled.select`
-  padding: 0.5rem;
-  border: 1px solid #ddd;
+  width: 100%;
+  max-width: 400px;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
   border-radius: 4px;
   font-size: 1rem;
-  min-width: 250px;
   background-color: white;
-  color: #333;
+
+  &:focus {
+    outline: none;
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  }
 `;
 
 const FilterSection = styled.div`
@@ -34,7 +59,7 @@ const FilterSection = styled.div`
   padding: 1.5rem;
   border-radius: 6px;
   margin-bottom: 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid #e9ecef;
 `;
 
 const FilterRow = styled.div`
@@ -43,6 +68,10 @@ const FilterRow = styled.div`
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 1rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
 const FilterInput = styled.input`
@@ -50,25 +79,42 @@ const FilterInput = styled.input`
   border: 1px solid #ddd;
   border-radius: 4px;
   min-width: 200px;
+  font-size: 0.9rem;
+
+  &:focus {
+    outline: none;
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  }
 `;
 
 const FilterSelect = styled.select`
   padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 4px;
-  min-width: 150px;
+  min-width: 200px;
+  font-size: 0.9rem;
+  background-color: white;
+
+  &:focus {
+    outline: none;
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  }
 `;
 
 const FilterButton = styled.button`
-  background-color: #007bff;
+  background-color: #28a745; /* Changed to green */
   color: white;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
-  
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+
   &:hover {
-    background-color: #0056b3;
+    background-color: #218838;
   }
 `;
 
@@ -79,113 +125,135 @@ const ClearButton = styled.button`
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
-  
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+
   &:hover {
     background-color: #545b62;
   }
 `;
 
-const TreatmentGrid = styled.div`
+const StatsGrid = styled.div`
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-`;
-
-const TreatmentCard = styled.div`
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-  border-left: 4px solid ${props => props.$isUpdated ? '#28a745' : '#007bff'};
-  
-  ${props => props.$isUpdated && `
-    animation: highlight 2s ease-in-out;
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-  `}
-  
-  &:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    transform: translateY(-2px);
-  }
-  
-  @keyframes highlight {
-    0% { background-color: #d4edda; }
-    100% { background-color: white; }
-  }
-`;
-
-const PatientName = styled.h4`
-  margin: 0 0 0.5rem 0;
-  color: #2c3e50;
-  font-size: 1.2rem;
-`;
-
-const TreatmentDate = styled.div`
-  color: #6c757d;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-`;
-
-const TreatmentType = styled.div`
-  background-color: #e9ecef;
-  color: #495057;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  display: inline-block;
-  margin-bottom: 1rem;
-`;
-
-const TherapyDescription = styled.div`
-  color: #495057;
-  line-height: 1.4;
-  margin-bottom: 1rem;
-`;
-
-const UpdateIndicator = styled.div`
-  background-color: #28a745;
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  display: inline-block;
-  margin-top: 0.5rem;
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 3rem;
-  color: #6c757d;
-  grid-column: 1 / -1;
-`;
-
-const StatsSection = styled.div`
-  display: flex;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
 `;
 
 const StatCard = styled.div`
   background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1.5rem;
   text-align: center;
-  flex: 1;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 `;
 
 const StatNumber = styled.div`
   font-size: 2rem;
   font-weight: bold;
-  color: #007bff;
+  color: #28a745; /* Changed to green */
+  margin-bottom: 0.5rem;
 `;
 
 const StatLabel = styled.div`
   color: #6c757d;
   font-size: 0.9rem;
+  font-weight: 500;
+`;
+
+const TreatmentGrid = styled.div`
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+`;
+
+const TreatmentCard = styled.div`
+  background-color: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  border-left: 4px solid #28a745;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+  }
+`;
+
+const PatientName = styled.h4`
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1.3rem;
+  font-weight: 600;
+`;
+
+const TreatmentDate = styled.div`
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+`;
+
+const TreatmentType = styled.div`
+  background-color: #e8f5e8;
+  color: #28a745;
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+`;
+
+const TherapyDescription = styled.div`
+  color: #495057;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #28a745;
+`;
+
+const UpdateIndicator = styled.div`
+  background-color: #28a745;
+  color: white;
+  padding: 0.3rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-weight: 500;
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 4rem;
+  color: #6c757d;
+  grid-column: 1 / -1;
+  background-color: white;
+  border-radius: 8px;
+  border: 2px dashed #dee2e6;
+`;
+
+const EmptyStateIcon = styled.div`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #adb5bd;
+`;
+
+const EmptyStateTitle = styled.h3`
+  margin: 0 0 1rem 0;
+  color: #6c757d;
+`;
+
+const EmptyStateText = styled.p`
+  margin: 0;
+  color: #adb5bd;
+  font-size: 1.1rem;
 `;
 
 const LoadingSpinner = styled.div`
@@ -203,6 +271,49 @@ const ErrorMessage = styled.div`
   padding: 1rem;
   border-radius: 4px;
   margin-bottom: 1rem;
+  border: 1px solid #f5c6cb;
+`;
+
+const SuccessMessage = styled.div`
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border: 1px solid #c3e6cb;
+`;
+
+const ActionButtonsRow = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+`;
+
+const ActionButton = styled.button`
+  background-color: ${props => props.$variant === 'success' ? '#28a745' : 
+                              props.$variant === 'warning' ? '#ffc107' : 
+                              props.$variant === 'danger' ? '#dc3545' : '#28a745'};
+  color: ${props => props.$variant === 'warning' ? '#212529' : 'white'};
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
 `;
 
 function DoctorDashboard() {
@@ -214,7 +325,7 @@ function DoctorDashboard() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [updatedTreatments, setUpdatedTreatments] = useState(new Set());
+  const [success, setSuccess] = useState(null);
 
   // Filter States
   const [filters, setFilters] = useState({
@@ -245,41 +356,37 @@ function DoctorDashboard() {
     applyFilters();
   }, [treatments, filters]);
 
-  // Simulate real-time updates (for demo purposes)
+  // Auto-clear messages
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Simulate treatment updates
-      if (Math.random() < 0.1 && filteredTreatments.length > 0) { // 10% chance every 5 seconds
-        const randomTreatment = filteredTreatments[Math.floor(Math.random() * filteredTreatments.length)];
-        setUpdatedTreatments(prev => new Set([...prev, randomTreatment.treatmentId]));
-        
-        // Remove highlight after 3 seconds
-        setTimeout(() => {
-          setUpdatedTreatments(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(randomTreatment.treatmentId);
-            return newSet;
-          });
-        }, 3000);
-      }
-    }, 5000);
+    if (success) {
+      const timer = setTimeout(() => setSuccess(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
 
-    return () => clearInterval(interval);
-  }, [filteredTreatments]);
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(null), 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const loadDoctors = async () => {
     try {
+      setLoading(true);
       const response = await employeeAPI.getAll();
-      setDoctors(response.data);
+      setDoctors(response.data || []);
     } catch (err) {
       setError('Fehler beim Laden der Ärzte: ' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const loadPatients = async () => {
     try {
       const response = await patientAPI.getAll();
-      setPatients(response.data);
+      setPatients(response.data || []);
     } catch (err) {
       setError('Fehler beim Laden der Patienten: ' + err.message);
     }
@@ -288,12 +395,10 @@ function DoctorDashboard() {
   const loadTreatments = async () => {
     if (!selectedDoctorId) return;
     
-    setLoading(true);
-    setError(null);
-    
     try {
+      setLoading(true);
       const response = await treatmentAPI.getByDoctorId(selectedDoctorId);
-      setTreatments(response.data);
+      setTreatments(response.data || []);
     } catch (err) {
       setError('Fehler beim Laden der Behandlungen: ' + err.message);
     } finally {
@@ -360,150 +465,192 @@ function DoctorDashboard() {
 
   const getDoctorName = (doctorId) => {
     const doctor = doctors.find(d => d.personId === parseInt(doctorId));
-    return doctor ? `${doctor.firstname} ${doctor.name}` : 'Arzt auswählen';
+    return doctor ? `${doctor.firstname} ${doctor.name}` : 'Unbekannter Arzt';
   };
 
-  const getTreatmentTypeFromTherapy = (therapy) => {
-    if (!therapy) return 'Allgemein';
-    const therapyLower = therapy.toLowerCase();
-    if (therapyLower.includes('physiotherapie') || therapyLower.includes('physio')) return 'Physiotherapie';
-    if (therapyLower.includes('operation') || therapyLower.includes('chirurg')) return 'Chirurgie';
-    if (therapyLower.includes('medikament') || therapyLower.includes('arzne')) return 'Medikamentös';
-    if (therapyLower.includes('diagnostik') || therapyLower.includes('untersuchung')) return 'Diagnostik';
-    return 'Allgemein';
+  const getDoctorInfo = (doctorId) => {
+    const doctor = doctors.find(d => d.personId === parseInt(doctorId));
+    return doctor ? {
+      name: `${doctor.firstname} ${doctor.name}`,
+      department: doctor.department || 'Kein Fachbereich',
+      email: doctor.email || 'Keine E-Mail',
+      phone: doctor.phonenumber || 'Keine Telefonnummer'
+    } : null;
   };
 
-  // Calculate statistics
-  const todayTreatments = filteredTreatments.filter(t => 
-    new Date(t.date).toDateString() === new Date().toDateString()
-  ).length;
-  
-  const upcomingTreatments = filteredTreatments.filter(t => 
-    new Date(t.date) > new Date()
-  ).length;
+  const getTodaysTreatments = () => {
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0];
+    
+    return treatments.filter(treatment => {
+      if (!treatment.date) return false;
+      const treatmentDate = new Date(treatment.date).toISOString().split('T')[0];
+      return treatmentDate === todayString;
+    });
+  };
+    await loadDoctors();
+    await loadPatients();
+    if (selectedDoctorId) {
+      await loadTreatments();
+    }
+    setSuccess('Daten erfolgreich aktualisiert!');
+  };
+
+  if (loading && !selectedDoctorId) {
+    return (
+      <DashboardContainer>
+        <LoadingSpinner>Lade Daten...</LoadingSpinner>
+      </DashboardContainer>
+    );
+  }
+
+  const selectedDoctor = getDoctorInfo(selectedDoctorId);
 
   return (
     <DashboardContainer>
       <HeaderSection>
-        <h2>Arzt Dashboard</h2>
-        <DoctorSelector 
-          value={selectedDoctorId} 
-          onChange={(e) => setSelectedDoctorId(e.target.value)}
-        >
-          <option value="">Arzt auswählen...</option>
-          {doctors.map(doctor => (
-            <option key={doctor.personId} value={doctor.personId}>
-              {doctor.firstname} {doctor.name} - {doctor.department}
-            </option>
-          ))}
-        </DoctorSelector>
+        <DashboardTitle>👨‍⚕️ Arzt Dashboard</DashboardTitle>
+        <DashboardSubtitle>
+          Persönliche Behandlungsübersicht und Patientenverwaltung
+        </DashboardSubtitle>
       </HeaderSection>
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
+      {success && <SuccessMessage>{success}</SuccessMessage>}
 
-      {selectedDoctorId && (
+      <DoctorSelectorSection>
+        <h4 style={{margin: '0 0 1rem 0', color: '#495057'}}>🔍 Arzt auswählen</h4>
+        <DoctorSelector
+          value={selectedDoctorId}
+          onChange={(e) => setSelectedDoctorId(e.target.value)}
+        >
+          <option value="">Bitte einen Arzt auswählen...</option>
+          {doctors.map(doctor => (
+            <option key={doctor.personId} value={doctor.personId}>
+              {doctor.firstname} {doctor.name} - {doctor.department || 'Kein Fachbereich'}
+            </option>
+          ))}
+        </DoctorSelector>
+      </DoctorSelectorSection>
+
+      {selectedDoctorId && selectedDoctor && (
         <>
-          <StatsSection>
+          <StatsGrid>
             <StatCard>
-              <StatNumber>{filteredTreatments.length}</StatNumber>
-              <StatLabel>Gesamt Behandlungen</StatLabel>
+              <StatNumber>{getTodaysTreatments().length}</StatNumber>
+              <StatLabel>Behandlungen heute</StatLabel>
             </StatCard>
             <StatCard>
-              <StatNumber>{todayTreatments}</StatNumber>
-              <StatLabel>Heute</StatLabel>
+              <StatNumber>{treatments.length}</StatNumber>
+              <StatLabel>Behandlungen gesamt</StatLabel>
             </StatCard>
             <StatCard>
-              <StatNumber>{upcomingTreatments}</StatNumber>
-              <StatLabel>Anstehend</StatLabel>
+              <StatNumber>{new Set(treatments.map(t => t.patientPersonId)).size}</StatNumber>
+              <StatLabel>Verschiedene Patienten</StatLabel>
             </StatCard>
-          </StatsSection>
+            <StatCard>
+              <StatNumber>{selectedDoctor.department}</StatNumber>
+              <StatLabel>Fachbereich</StatLabel>
+            </StatCard>
+          </StatsGrid>
+
+          <ActionButtonsRow>
+            <ActionButton $variant="success" onClick={refreshData} disabled={loading}>
+              {loading ? 'Aktualisiere...' : 'Daten aktualisieren'}
+            </ActionButton>
+          </ActionButtonsRow>
 
           <FilterSection>
-            <h4>Filter</h4>
+            <h4 style={{margin: '0 0 1rem 0', color: '#495057'}}>🔍 Behandlungen filtern</h4>
             <FilterRow>
-              <div>
-                <label>Von Datum:</label>
-                <FilterInput
-                  type="date"
-                  value={filters.startDate}
-                  onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                />
-              </div>
-              <div>
-                <label>Bis Datum:</label>
-                <FilterInput
-                  type="date"
-                  value={filters.endDate}
-                  onChange={(e) => handleFilterChange('endDate', e.target.value)}
-                />
-              </div>
-              <div>
-                <label>Behandlungstyp:</label>
-                <FilterInput
-                  type="text"
-                  placeholder="z.B. Physiotherapie, Operation..."
-                  value={filters.treatmentType}
-                  onChange={(e) => handleFilterChange('treatmentType', e.target.value)}
-                />
-              </div>
-            </FilterRow>
-            <FilterRow>
-              <div>
-                <label>Patientenname:</label>
-                <FilterInput
-                  type="text"
-                  placeholder="Vor- oder Nachname eingeben..."
-                  value={filters.patientName}
-                  onChange={(e) => handleFilterChange('patientName', e.target.value)}
-                />
-              </div>
-              <FilterButton onClick={applyFilters}>Filter anwenden</FilterButton>
-              <ClearButton onClick={clearFilters}>Filter zurücksetzen</ClearButton>
+              <FilterInput
+                type="date"
+                placeholder="Von Datum"
+                value={filters.startDate}
+                onChange={(e) => handleFilterChange('startDate', e.target.value)}
+              />
+              <FilterInput
+                type="date"
+                placeholder="Bis Datum"
+                value={filters.endDate}
+                onChange={(e) => handleFilterChange('endDate', e.target.value)}
+              />
+              <FilterInput
+                type="text"
+                placeholder="Behandlungstyp suchen..."
+                value={filters.treatmentType}
+                onChange={(e) => handleFilterChange('treatmentType', e.target.value)}
+              />
+              <FilterInput
+                type="text"
+                placeholder="Patientenname suchen..."
+                value={filters.patientName}
+                onChange={(e) => handleFilterChange('patientName', e.target.value)}
+              />
+              <ClearButton onClick={clearFilters}>
+                Filter zurücksetzen
+              </ClearButton>
             </FilterRow>
           </FilterSection>
 
           {loading ? (
             <LoadingSpinner>Lade Behandlungen...</LoadingSpinner>
+          ) : filteredTreatments.length === 0 ? (
+            <EmptyState>
+              <EmptyStateIcon>📋</EmptyStateIcon>
+              <EmptyStateTitle>Keine Behandlungen gefunden</EmptyStateTitle>
+              <EmptyStateText>
+                {treatments.length === 0 
+                  ? `Dr. ${selectedDoctor.name} hat noch keine Behandlungen.`
+                  : 'Keine Behandlungen entsprechen den aktuellen Filterkriterien.'
+                }
+              </EmptyStateText>
+            </EmptyState>
           ) : (
             <TreatmentGrid>
-              {filteredTreatments.length === 0 ? (
-                <EmptyState>
-                  <h3>Keine Behandlungen gefunden</h3>
-                  <p>Für den ausgewählten Arzt und die gesetzten Filter wurden keine Behandlungen gefunden.</p>
-                </EmptyState>
-              ) : (
-                filteredTreatments.map(treatment => (
-                  <TreatmentCard 
-                    key={treatment.treatmentId}
-                    $isUpdated={updatedTreatments.has(treatment.treatmentId)}
-                  >
-                    <PatientName>{getPatientName(treatment.patientPersonId)}</PatientName>
+              {filteredTreatments.map(treatment => {
+                const patient = patients.find(p => p.personId === treatment.patientPersonId);
+                
+                return (
+                  <TreatmentCard key={treatment.treatmentId}>
+                    <PatientName>
+                      👤 {patient ? `${patient.firstname} ${patient.name}` : 'Unbekannter Patient'}
+                    </PatientName>
+                    
                     <TreatmentDate>
-                      {new Date(treatment.date).toLocaleDateString('de-DE')} - 
-                      ID: {treatment.treatmentId}
+                      📅 {treatment.date ? new Date(treatment.date).toLocaleDateString('de-DE', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      }) : 'Kein Datum'}
                     </TreatmentDate>
+                    
                     <TreatmentType>
-                      {getTreatmentTypeFromTherapy(treatment.therapy)}
+                      Behandlungs-ID: {treatment.treatmentId}
                     </TreatmentType>
-                    <TherapyDescription>
-                      {treatment.therapy || 'Keine Therapiebeschreibung verfügbar'}
-                    </TherapyDescription>
-                    {updatedTreatments.has(treatment.treatmentId) && (
-                      <UpdateIndicator>Kürzlich aktualisiert</UpdateIndicator>
+                    
+                    {treatment.therapy && (
+                      <TherapyDescription>
+                        <strong>Therapiebeschreibung:</strong><br />
+                        {treatment.therapy}
+                      </TherapyDescription>
+                    )}
+                    
+                    {patient && (
+                      <div style={{marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f8f9fa', borderRadius: '4px'}}>
+                        <div style={{fontSize: '0.9rem', color: '#6c757d'}}>
+                          <strong>📞 Kontakt:</strong> {patient.phonenumber || 'Nicht verfügbar'}<br />
+                          <strong>📧 E-Mail:</strong> {patient.email || 'Nicht verfügbar'}
+                        </div>
+                      </div>
                     )}
                   </TreatmentCard>
-                ))
-              )}
+                );
+              })}
             </TreatmentGrid>
           )}
         </>
-      )}
-
-      {!selectedDoctorId && (
-        <EmptyState>
-          <h3>Willkommen im Arzt Dashboard</h3>
-          <p>Bitte wählen Sie einen Arzt aus dem Dropdown-Menü aus, um die zugewiesenen Behandlungen anzuzeigen.</p>
-        </EmptyState>
       )}
     </DashboardContainer>
   );
