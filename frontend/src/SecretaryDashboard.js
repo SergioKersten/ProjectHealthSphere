@@ -905,9 +905,7 @@ function SecretaryDashboard() {
         <ActionButton $variant="success" onClick={() => openModal('ward', 'add')}>
           Neue Station hinzufügen
         </ActionButton>
-        <ActionButton onClick={loadAllData} disabled={loading}>
-          Daten aktualisieren
-        </ActionButton>
+        
       </ActionButtonsRow>
 
       {/* Kalender Integration */}

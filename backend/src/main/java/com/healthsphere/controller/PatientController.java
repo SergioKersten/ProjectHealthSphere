@@ -46,7 +46,7 @@ public class PatientController {
     @PostMapping
     public ResponseEntity<String> createPatient(@RequestBody PatientRequest request) {
         try {
-            long newId = generateUniqueId(); // Neue Methode
+            long newId = generateUniqueId();
             Patient patient = new Patient(
                     newId, // Automatisch generierte ID
                     request.getName(),
@@ -55,8 +55,7 @@ public class PatientController {
                     request.getEmail(),
                     request.getBirthdate(),
                     request.getAdress(),
-                    request.getWardId() // Ward-ID hinzugefügt
-            );
+                    request.getWardId());
 
             boolean added = patientManager.addPerson(patient);
             if (added) {
@@ -73,7 +72,18 @@ public class PatientController {
     }
 
     private long generateUniqueId() {
-        return patientManager.getAll().size() + 1;
+        Set<Patient> allPatients = patientManager.getAll();
+        if (allPatients.isEmpty()) {
+            return 1;
+        }
+
+        // Finde die höchste existierende ID und füge 1 hinzu
+        long maxId = allPatients.stream()
+                .mapToLong(Patient::getPersonId)
+                .max()
+                .orElse(0);
+
+        return maxId + 1;
     }
 
     @PutMapping("/{id}")
@@ -109,7 +119,6 @@ public class PatientController {
 
     // DTO Classes - erweitert um Ward-Unterstützung
     public static class PatientRequest {
-        private long personId;
         private String name;
         private String firstname;
         private String phonenumber;
@@ -117,15 +126,6 @@ public class PatientController {
         private LocalDate birthdate;
         private String adress;
         private Integer wardId; // Ward-ID hinzugefügt
-
-        // Getters and Setters
-        public long getPersonId() {
-            return personId;
-        }
-
-        public void setPersonId(long personId) {
-            this.personId = personId;
-        }
 
         public String getName() {
             return name;

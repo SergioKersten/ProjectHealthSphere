@@ -545,11 +545,7 @@ function DoctorDashboard() {
             </StatCard>
           </StatsGrid>
 
-          <ActionButtonsRow>
-            <ActionButton $variant="success" onClick={refreshData} disabled={loading}>
-              {loading ? 'Aktualisiere...' : 'Daten aktualisieren'}
-            </ActionButton>
-          </ActionButtonsRow>
+          
 
           <FilterSection>
             <h4 style={{margin: '0 0 1rem 0', color: '#495057'}}>🔍 Behandlungen filtern</h4>
