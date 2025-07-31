@@ -549,6 +549,13 @@ function SecretaryDashboard() {
   const [hoveredTreatment, setHoveredTreatment] = useState(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   
+  // Calendar Filter State
+  const [calendarFilters, setCalendarFilters] = useState({
+    doctor: '',
+    patient: '',
+    ward: ''
+  });
+  
   // Data States
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
@@ -856,36 +863,7 @@ function SecretaryDashboard() {
         </StatCard>
       </StatsGrid>
       
-      <FilterSection>
-        <h4>Schnellfilter</h4>
-        <FilterRow>
-          <FilterInput
-            type="text"
-            placeholder="Suche nach Namen..."
-            value={filters.searchTerm}
-            onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-          />
-          <FilterSelect
-            value={filters.department}
-            onChange={(e) => handleFilterChange('department', e.target.value)}
-          >
-            <option value="">Alle Fachbereiche</option>
-            {[...new Set(doctors.map(d => d.department).filter(Boolean))].map(dept => (
-              <option key={dept} value={dept}>{dept}</option>
-            ))}
-          </FilterSelect>
-          <FilterSelect
-            value={filters.ward}
-            onChange={(e) => handleFilterChange('ward', e.target.value)}
-          >
-            <option value="">Alle Stationen</option>
-            {wards.map(ward => (
-              <option key={ward.wardId} value={ward.wardId}>{ward.wardName}</option>
-            ))}
-          </FilterSelect>
-          <ClearButton onClick={clearFilters}>Filter zurücksetzen</ClearButton>
-        </FilterRow>
-      </FilterSection>
+      
 
       <ActionButtonsRow>
         <ActionButton $variant="success" onClick={() => openModal('patient', 'add')}>
@@ -901,6 +879,9 @@ function SecretaryDashboard() {
           Daten aktualisieren
         </ActionButton>
       </ActionButtonsRow>
+
+      {/* Kalender Integration */}
+      {renderCalendar()}
     </div>
   );
 
@@ -1000,8 +981,52 @@ function SecretaryDashboard() {
            date1.getMonth() === date2.getMonth();
   };
 
-  const getTreatmentsForDate = (date) => {
+  const handleCalendarFilterChange = (field, value) => {
+    setCalendarFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const clearCalendarFilters = () => {
+    setCalendarFilters({
+      doctor: '',
+      patient: '',
+      ward: ''
+    });
+  };
+
+  const getFilteredTreatmentsForCalendar = () => {
     return treatments.filter(treatment => {
+      // Doctor filter
+      if (calendarFilters.doctor && treatment.doctorPersonId.toString() !== calendarFilters.doctor) {
+        return false;
+      }
+      
+      // Patient filter
+      if (calendarFilters.patient && treatment.patientPersonId.toString() !== calendarFilters.patient) {
+        return false;
+      }
+      
+      // Ward filter - check if doctor or patient belongs to selected ward
+      if (calendarFilters.ward) {
+        const doctor = doctors.find(d => d.personId === treatment.doctorPersonId);
+        const patient = patients.find(p => p.personId === treatment.patientPersonId);
+        const doctorInWard = doctor && doctor.wardId && doctor.wardId.toString() === calendarFilters.ward;
+        const patientInWard = patient && patient.wardId && patient.wardId.toString() === calendarFilters.ward;
+        
+        if (!doctorInWard && !patientInWard) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  };
+
+  const getTreatmentsForDate = (date) => {
+    const filteredTreatments = getFilteredTreatmentsForCalendar();
+    return filteredTreatments.filter(treatment => {
       if (!treatment.date) return false;
       const treatmentDate = new Date(treatment.date);
       return treatmentDate.toDateString() === date.toDateString();
@@ -1086,30 +1111,66 @@ function SecretaryDashboard() {
       });
     }
 
-    // Create legend for doctors
-    const activeDoctors = [...new Set(treatments.map(t => t.doctorPersonId))]
+    // Create legend for doctors (based on filtered treatments)
+    const filteredTreatments = getFilteredTreatmentsForCalendar();
+    const activeDoctors = [...new Set(filteredTreatments.map(t => t.doctorPersonId))]
       .map(id => doctors.find(d => d.personId === id))
       .filter(Boolean);
 
     return (
       <div>
-        <CalendarControls>
-          <ActionButton $variant="success" onClick={() => openModal('treatment', 'add')}>
-            Neue Behandlung hinzufügen
-          </ActionButton>
-          <CalendarViewSelect
-            value={calendarView}
-            onChange={(e) => setCalendarView(e.target.value)}
-          >
-            <option value="month">Monatsansicht</option>
-            <option value="week">Wochenansicht</option>
-          </CalendarViewSelect>
-        </CalendarControls>
+        {/* Calendar Filters */}
+        <FilterSection>
+          <h4>📅 Kalender Filter</h4>
+          <FilterRow>
+            <FilterSelect
+              value={calendarFilters.doctor}
+              onChange={(e) => handleCalendarFilterChange('doctor', e.target.value)}
+            >
+              <option value="">Alle Ärzte</option>
+              {doctors.map(doctor => (
+                <option key={doctor.personId} value={doctor.personId}>
+                  {doctor.firstname} {doctor.name} - {doctor.department || 'Kein Fachbereich'}
+                </option>
+              ))}
+            </FilterSelect>
+            
+            <FilterSelect
+              value={calendarFilters.patient}
+              onChange={(e) => handleCalendarFilterChange('patient', e.target.value)}
+            >
+              <option value="">Alle Patienten</option>
+              {patients.map(patient => (
+                <option key={patient.personId} value={patient.personId}>
+                  {patient.firstname} {patient.name}
+                </option>
+              ))}
+            </FilterSelect>
+            
+            <FilterSelect
+              value={calendarFilters.ward}
+              onChange={(e) => handleCalendarFilterChange('ward', e.target.value)}
+            >
+              <option value="">Alle Stationen</option>
+              {wards.map(ward => (
+                <option key={ward.wardId} value={ward.wardId}>
+                  {ward.wardName}
+                </option>
+              ))}
+            </FilterSelect>
+            
+            <ClearButton onClick={clearCalendarFilters}>
+              Filter zurücksetzen
+            </ClearButton>
+          </FilterRow>
+        </FilterSection>
+
+        
 
         {activeDoctors.length > 0 && (
           <CalendarLegend>
             <strong>Ärzte:</strong>
-            {activeDoctors.map((doctor, index) => (
+            {activeDoctors.map((doctor) => (
               <CalendarLegendItem key={doctor.personId}>
                 <CalendarLegendColor $color={getDoctorColor(doctor.personId)} />
                 <span>{doctor.firstname} {doctor.name}</span>
@@ -1619,12 +1680,6 @@ function SecretaryDashboard() {
         >
           Behandlungen
         </Tab>
-        <Tab 
-          $active={activeTab === 'calendar'} 
-          onClick={() => setActiveTab('calendar')}
-        >
-          📅 Kalender
-        </Tab>
       </TabsContainer>
 
       <ContentArea>
@@ -1632,7 +1687,6 @@ function SecretaryDashboard() {
         {activeTab === 'patients' && renderPatients()}
         {activeTab === 'doctors' && renderDoctors()}
         {activeTab === 'treatments' && renderTreatments()}
-        {activeTab === 'calendar' && renderCalendar()}
       </ContentArea>
 
       {renderModal()}
