@@ -46,8 +46,9 @@ public class PatientController {
     @PostMapping
     public ResponseEntity<String> createPatient(@RequestBody PatientRequest request) {
         try {
+            long newId = generateUniqueId(); // Neue Methode
             Patient patient = new Patient(
-                    request.getPersonId(),
+                    newId, // Automatisch generierte ID
                     request.getName(),
                     request.getFirstname(),
                     request.getPhonenumber(),
@@ -69,6 +70,10 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Fehler beim Erstellen des Patienten: " + e.getMessage());
         }
+    }
+
+    private long generateUniqueId() {
+        return patientManager.getAll().size() + 1;
     }
 
     @PutMapping("/{id}")
