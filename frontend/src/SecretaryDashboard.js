@@ -383,12 +383,171 @@ const ModalActions = styled.div`
   margin-top: 2rem;
 `;
 
+// Calendar Styles
+const CalendarContainer = styled.div`
+  background-color: white;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+`;
+
+const CalendarHeader = styled.div`
+  background-color: #28a745;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const CalendarNavButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+`;
+
+const CalendarTitle = styled.h3`
+  margin: 0;
+  font-size: 1.5rem;
+`;
+
+const CalendarGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border: 1px solid #e9ecef;
+`;
+
+const CalendarDayHeader = styled.div`
+  background-color: #f8f9fa;
+  padding: 1rem;
+  text-align: center;
+  font-weight: bold;
+  color: #495057;
+  border-right: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+
+  &:last-child {
+    border-right: none;
+  }
+`;
+
+const CalendarDay = styled.div`
+  min-height: 120px;
+  padding: 0.5rem;
+  border-right: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+  background-color: ${props => 
+    props.$isToday ? '#e3f2fd' : 
+    props.$isOtherMonth ? '#f8f9fa' : 'white'};
+  position: relative;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &:hover {
+    background-color: ${props => props.$isOtherMonth ? '#f8f9fa' : '#f0f8ff'};
+  }
+`;
+
+const CalendarDayNumber = styled.div`
+  font-weight: ${props => props.$isToday ? 'bold' : 'normal'};
+  color: ${props => 
+    props.$isToday ? '#007bff' : 
+    props.$isOtherMonth ? '#6c757d' : '#495057'};
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+`;
+
+const CalendarTreatment = styled.div`
+  background-color: ${props => {
+    const colors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14'];
+    return colors[props.$colorIndex % colors.length];
+  }};
+  color: white;
+  padding: 0.25rem;
+  margin-bottom: 0.25rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+const CalendarLegend = styled.div`
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+`;
+
+const CalendarLegendItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const CalendarLegendColor = styled.div`
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background-color: ${props => props.$color};
+`;
+
+const CalendarControls = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+`;
+
+const CalendarViewSelect = styled.select`
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+`;
+
+const TreatmentTooltip = styled.div`
+  position: absolute;
+  background-color: #343a40;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  z-index: 1000;
+  min-width: 200px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  pointer-events: none;
+`;
+
 function SecretaryDashboard() {
   // State Management
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  
+  // Calendar State
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [calendarView, setCalendarView] = useState('month'); // 'month', 'week'
+  const [hoveredTreatment, setHoveredTreatment] = useState(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   
   // Data States
   const [patients, setPatients] = useState([]);
@@ -817,6 +976,216 @@ function SecretaryDashboard() {
             ))}
           </tbody>
         </DataTable>
+      </div>
+    );
+  };
+
+  // Calendar helper functions
+  const getDaysInMonth = (date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (date) => {
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    return firstDay === 0 ? 6 : firstDay - 1; // Monday = 0
+  };
+
+  const isToday = (date) => {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
+
+  const isSameMonth = (date1, date2) => {
+    return date1.getFullYear() === date2.getFullYear() && 
+           date1.getMonth() === date2.getMonth();
+  };
+
+  const getTreatmentsForDate = (date) => {
+    return treatments.filter(treatment => {
+      if (!treatment.date) return false;
+      const treatmentDate = new Date(treatment.date);
+      return treatmentDate.toDateString() === date.toDateString();
+    });
+  };
+
+  const getDoctorColor = (doctorId) => {
+    const colors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c'];
+    const doctorIndex = doctors.findIndex(d => d.personId === doctorId);
+    return colors[doctorIndex % colors.length];
+  };
+
+  const navigateCalendar = (direction) => {
+    const newDate = new Date(currentDate);
+    if (calendarView === 'month') {
+      newDate.setMonth(newDate.getMonth() + direction);
+    } else {
+      newDate.setDate(newDate.getDate() + (direction * 7));
+    }
+    setCurrentDate(newDate);
+  };
+
+  const handleTreatmentHover = (treatment, event) => {
+    setHoveredTreatment(treatment);
+    setTooltipPosition({
+      x: event.clientX + 10,
+      y: event.clientY - 10
+    });
+  };
+
+  const renderCalendar = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const daysInMonth = getDaysInMonth(currentDate);
+    const firstDay = getFirstDayOfMonth(currentDate);
+    
+    const monthNames = [
+      'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+      'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+    ];
+    
+    const dayNames = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+    
+    // Generate calendar days
+    const calendarDays = [];
+    
+    // Previous month days
+    const prevMonth = new Date(year, month - 1, 0);
+    const prevMonthDays = prevMonth.getDate();
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const day = prevMonthDays - i;
+      const date = new Date(year, month - 1, day);
+      calendarDays.push({
+        date,
+        day,
+        isOtherMonth: true,
+        treatments: getTreatmentsForDate(date)
+      });
+    }
+    
+    // Current month days
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      calendarDays.push({
+        date,
+        day,
+        isOtherMonth: false,
+        treatments: getTreatmentsForDate(date)
+      });
+    }
+    
+    // Next month days
+    const totalCells = Math.ceil(calendarDays.length / 7) * 7;
+    const remainingCells = totalCells - calendarDays.length;
+    for (let day = 1; day <= remainingCells; day++) {
+      const date = new Date(year, month + 1, day);
+      calendarDays.push({
+        date,
+        day,
+        isOtherMonth: true,
+        treatments: getTreatmentsForDate(date)
+      });
+    }
+
+    // Create legend for doctors
+    const activeDoctors = [...new Set(treatments.map(t => t.doctorPersonId))]
+      .map(id => doctors.find(d => d.personId === id))
+      .filter(Boolean);
+
+    return (
+      <div>
+        <CalendarControls>
+          <ActionButton $variant="success" onClick={() => openModal('treatment', 'add')}>
+            Neue Behandlung hinzufügen
+          </ActionButton>
+          <CalendarViewSelect
+            value={calendarView}
+            onChange={(e) => setCalendarView(e.target.value)}
+          >
+            <option value="month">Monatsansicht</option>
+            <option value="week">Wochenansicht</option>
+          </CalendarViewSelect>
+        </CalendarControls>
+
+        {activeDoctors.length > 0 && (
+          <CalendarLegend>
+            <strong>Ärzte:</strong>
+            {activeDoctors.map((doctor, index) => (
+              <CalendarLegendItem key={doctor.personId}>
+                <CalendarLegendColor $color={getDoctorColor(doctor.personId)} />
+                <span>{doctor.firstname} {doctor.name}</span>
+              </CalendarLegendItem>
+            ))}
+          </CalendarLegend>
+        )}
+
+        <CalendarContainer>
+          <CalendarHeader>
+            <CalendarNavButton onClick={() => navigateCalendar(-1)}>
+              ‹
+            </CalendarNavButton>
+            <CalendarTitle>
+              {monthNames[month]} {year}
+            </CalendarTitle>
+            <CalendarNavButton onClick={() => navigateCalendar(1)}>
+              ›
+            </CalendarNavButton>
+          </CalendarHeader>
+
+          <CalendarGrid>
+            {dayNames.map(day => (
+              <CalendarDayHeader key={day}>{day}</CalendarDayHeader>
+            ))}
+            
+            {calendarDays.map((calendarDay, index) => (
+              <CalendarDay
+                key={index}
+                $isToday={isToday(calendarDay.date)}
+                $isOtherMonth={calendarDay.isOtherMonth}
+              >
+                <CalendarDayNumber
+                  $isToday={isToday(calendarDay.date)}
+                  $isOtherMonth={calendarDay.isOtherMonth}
+                >
+                  {calendarDay.day}
+                </CalendarDayNumber>
+                
+                {calendarDay.treatments.map((treatment, treatmentIndex) => {
+                  const doctor = doctors.find(d => d.personId === treatment.doctorPersonId);
+                  const patient = patients.find(p => p.personId === treatment.patientPersonId);
+                  
+                  return (
+                    <CalendarTreatment
+                      key={treatment.treatmentId}
+                      $colorIndex={doctors.findIndex(d => d.personId === treatment.doctorPersonId)}
+                      onClick={() => openModal('treatment', 'edit', treatment)}
+                      onMouseEnter={(e) => handleTreatmentHover(treatment, e)}
+                      onMouseLeave={() => setHoveredTreatment(null)}
+                      title={`${patient ? `${patient.firstname} ${patient.name}` : 'Unbekannt'} - ${doctor ? `Dr. ${doctor.name}` : 'Unbekannt'}`}
+                    >
+                      {patient ? `${patient.firstname} ${patient.name.charAt(0)}.` : 'N/A'}
+                    </CalendarTreatment>
+                  );
+                })}
+              </CalendarDay>
+            ))}
+          </CalendarGrid>
+        </CalendarContainer>
+
+        {hoveredTreatment && (
+          <TreatmentTooltip
+            style={{
+              left: tooltipPosition.x,
+              top: tooltipPosition.y
+            }}
+          >
+            <div><strong>Patient:</strong> {getPatientName(hoveredTreatment.patientPersonId)}</div>
+            <div><strong>Arzt:</strong> {getDoctorName(hoveredTreatment.doctorPersonId)}</div>
+            <div><strong>Datum:</strong> {new Date(hoveredTreatment.date).toLocaleDateString()}</div>
+            {hoveredTreatment.therapy && (
+              <div><strong>Therapie:</strong> {hoveredTreatment.therapy}</div>
+            )}
+          </TreatmentTooltip>
+        )}
       </div>
     );
   };
@@ -1250,6 +1619,12 @@ function SecretaryDashboard() {
         >
           Behandlungen
         </Tab>
+        <Tab 
+          $active={activeTab === 'calendar'} 
+          onClick={() => setActiveTab('calendar')}
+        >
+          📅 Kalender
+        </Tab>
       </TabsContainer>
 
       <ContentArea>
@@ -1257,6 +1632,7 @@ function SecretaryDashboard() {
         {activeTab === 'patients' && renderPatients()}
         {activeTab === 'doctors' && renderDoctors()}
         {activeTab === 'treatments' && renderTreatments()}
+        {activeTab === 'calendar' && renderCalendar()}
       </ContentArea>
 
       {renderModal()}
