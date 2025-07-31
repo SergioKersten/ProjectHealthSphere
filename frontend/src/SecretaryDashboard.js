@@ -470,10 +470,24 @@ const CalendarDayNumber = styled.div`
 
 const CalendarTreatment = styled.div`
   background-color: ${props => {
-    const colors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14'];
+    const colors = [
+      '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c',
+      '#17a2b8', '#6c757d', '#343a40', '#f8f9fa', '#e9ecef', '#dee2e6', '#ced4da', '#adb5bd',
+      '#6610f2', '#e21e7e', '#fd7e14', '#20c997', '#0dcaf0', '#198754', '#ffc107', '#fd7e14'
+    ];
     return colors[props.$colorIndex % colors.length];
   }};
-  color: white;
+  color: ${props => {
+    // Für helle Farben dunklen Text verwenden
+    const lightColors = ['#ffc107', '#f8f9fa', '#e9ecef', '#dee2e6', '#ced4da', '#adb5bd'];
+    const colors = [
+      '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c',
+      '#17a2b8', '#6c757d', '#343a40', '#f8f9fa', '#e9ecef', '#dee2e6', '#ced4da', '#adb5bd',
+      '#6610f2', '#e21e7e', '#fd7e14', '#20c997', '#0dcaf0', '#198754', '#ffc107', '#fd7e14'
+    ];
+    const currentColor = colors[props.$colorIndex % colors.length];
+    return lightColors.includes(currentColor) ? '#212529' : 'white';
+  }};
   padding: 0.25rem;
   margin-bottom: 0.25rem;
   border-radius: 3px;
@@ -862,8 +876,6 @@ function SecretaryDashboard() {
           <StatLabel>Stationen gesamt</StatLabel>
         </StatCard>
       </StatsGrid>
-      
-      
 
       <ActionButtonsRow>
         <ActionButton $variant="success" onClick={() => openModal('patient', 'add')}>
@@ -1034,9 +1046,15 @@ function SecretaryDashboard() {
   };
 
   const getDoctorColor = (doctorId) => {
-    const colors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c'];
-    const doctorIndex = doctors.findIndex(d => d.personId === doctorId);
-    return colors[doctorIndex % colors.length];
+    const colors = [
+      '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c',
+      '#17a2b8', '#6c757d', '#343a40', '#f8f9fa', '#e9ecef', '#dee2e6', '#ced4da', '#adb5bd',
+      '#6610f2', '#e21e7e', '#fd7e14', '#20c997', '#0dcaf0', '#198754', '#ffc107', '#fd7e14'
+    ];
+    // Sortiere Ärzte nach ID für konsistente Reihenfolge und verwende Index
+    const sortedDoctors = [...doctors].sort((a, b) => a.personId - b.personId);
+    const doctorIndex = sortedDoctors.findIndex(d => d.personId === doctorId);
+    return doctorIndex >= 0 ? colors[doctorIndex % colors.length] : colors[0];
   };
 
   const navigateCalendar = (direction) => {
@@ -1165,7 +1183,11 @@ function SecretaryDashboard() {
           </FilterRow>
         </FilterSection>
 
-        
+        <CalendarControls>
+          <span style={{fontSize: '1.1rem', fontWeight: 'bold', color: '#495057'}}>
+            📅 Behandlungskalender
+          </span>
+        </CalendarControls>
 
         {activeDoctors.length > 0 && (
           <CalendarLegend>
@@ -1214,10 +1236,12 @@ function SecretaryDashboard() {
                   const doctor = doctors.find(d => d.personId === treatment.doctorPersonId);
                   const patient = patients.find(p => p.personId === treatment.patientPersonId);
                   
+                  const doctorIndex = [...doctors].sort((a, b) => a.personId - b.personId).findIndex(d => d.personId === treatment.doctorPersonId);
+                  
                   return (
                     <CalendarTreatment
                       key={treatment.treatmentId}
-                      $colorIndex={doctors.findIndex(d => d.personId === treatment.doctorPersonId)}
+                      $colorIndex={doctorIndex >= 0 ? doctorIndex : 0}
                       onClick={() => openModal('treatment', 'edit', treatment)}
                       onMouseEnter={(e) => handleTreatmentHover(treatment, e)}
                       onMouseLeave={() => setHoveredTreatment(null)}
