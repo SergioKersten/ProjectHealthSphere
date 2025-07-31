@@ -5,9 +5,11 @@ import './App.css';
 import styled from 'styled-components';
 import { patientAPI, employeeAPI, treatmentAPI, wardAPI } from './services/api';
 
-// Import generic components
+
 import EntityAdd from './EntityAdd';
 import EntityEdit from './EntityEdit';
+import DoctorDashboard from './DoctorDashboard';
+
 
 // Import configurations
 import { 
@@ -31,7 +33,15 @@ const Header1 = styled.div`
   padding-bottom: 10px;
 `;
 
-const ImageWrapper = styled.div``;
+const ImageWrapper = styled.div`
+height: 200px;
+width: auto;
+`;
+
+const StyledImg= styled.img`
+height: 200px;
+width: auto;
+`;
 
 const Container = styled.div`
   display: flex;
@@ -259,6 +269,12 @@ function SidebarNav() {
         $active={location.pathname === '/doctors'}
       >
         Doctors
+      </SidebarItem>
+      <SidebarItem 
+        to="/doctor-dashboard" 
+        $active={location.pathname === '/doctor-dashboard'}
+      >
+        Arzt Dashboard
       </SidebarItem>
       <SidebarItem 
         to="/treatments" 
@@ -634,7 +650,7 @@ function App() {
       <Wrapper>
         <Header1>
           <ImageWrapper>
-            <img src={logo} className="App-logo" alt="logo" />
+            <StyledImg src={logo} alt="logo" />
           </ImageWrapper>
         </Header1>
         <Container>
@@ -647,6 +663,9 @@ function App() {
             <Route path="/doctors" element={<DoctorsList />} />
             <Route path="/doctors/add" element={<DoctorAdd />} />
             <Route path="/doctors/edit/:id" element={<DoctorEdit />} />
+
+<Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+
             <Route path="/treatments" element={<TreatmentsList />} />
             <Route path="/treatments/add" element={<TreatmentAdd />} />
             <Route path="/treatments/edit/:id" element={<TreatmentEdit />} />
