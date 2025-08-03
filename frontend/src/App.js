@@ -5,20 +5,9 @@ import './App.css';
 import styled from 'styled-components';
 import { patientAPI, employeeAPI, treatmentAPI, wardAPI } from './services/api';
 
-import EntityAdd from './EntityAdd';
-import EntityEdit from './EntityEdit';
 import DoctorDashboard from './DoctorDashboard';
 import SecretaryDashboard from './SecretaryDashboard'; // Neuer Import
 
-// Import configurations
-import { 
-  patientConfig, 
-  doctorConfig, 
-  treatmentConfig, 
-  wardConfig,
-  dependentDataConfigs,
-  relatedDataConfigs
-} from './entityConfigs';
 
 // Styled Components
 const Wrapper = styled.div`
@@ -157,122 +146,6 @@ const AddButton = styled.button`
   }
 `;
 
-// Component Functions
-function PatientAdd() {
-  return (
-    <EntityAdd
-      entityType="patient"
-      entityConfig={patientConfig}
-      apiService={patientAPI}
-      redirectPath="/patients"
-      dependentData={{ wards: dependentDataConfigs.wards }}
-      relatedDataConfig={relatedDataConfigs.patientTreatments}
-    />
-  );
-}
-
-function PatientEdit() {
-  return (
-    <EntityEdit
-      entityType="patient"
-      entityConfig={{
-        ...patientConfig,
-        title: 'Edit Patient'
-      }}
-      apiService={patientAPI}
-      redirectPath="/patients"
-      dependentData={{ wards: dependentDataConfigs.wards }}
-      relatedDataConfig={relatedDataConfigs.patientTreatments}
-    />
-  );
-}
-
-function DoctorAdd() {
-  return (
-    <EntityAdd
-      entityType="doctor"
-      entityConfig={doctorConfig}
-      apiService={employeeAPI}
-      redirectPath="/doctors"
-      dependentData={{ wards: dependentDataConfigs.wards }}
-      relatedDataConfig={relatedDataConfigs.doctorTreatments}
-    />
-  );
-}
-
-function DoctorEdit() {
-  return (
-    <EntityEdit
-      entityType="doctor"
-      entityConfig={{
-        ...doctorConfig,
-        title: 'Edit Doctor'
-      }}
-      apiService={employeeAPI}
-      redirectPath="/doctors"
-      dependentData={{ wards: dependentDataConfigs.wards }}
-      relatedDataConfig={relatedDataConfigs.doctorTreatments}
-    />
-  );
-}
-
-function TreatmentAdd() {
-  return (
-    <EntityAdd
-      entityType="treatment"
-      entityConfig={treatmentConfig}
-      apiService={treatmentAPI}
-      redirectPath="/treatments"
-      dependentData={{ 
-        patients: dependentDataConfigs.patients,
-        doctors: dependentDataConfigs.doctors
-      }}
-    />
-  );
-}
-
-function TreatmentEdit() {
-  return (
-    <EntityEdit
-      entityType="treatment"
-      entityConfig={{
-        ...treatmentConfig,
-        title: 'Edit Treatment'
-      }}
-      apiService={treatmentAPI}
-      redirectPath="/treatments"
-      dependentData={{ 
-        patients: dependentDataConfigs.patients,
-        doctors: dependentDataConfigs.doctors
-      }}
-    />
-  );
-}
-
-function WardAdd() {
-  return (
-    <EntityAdd
-      entityType="ward"
-      entityConfig={wardConfig}
-      apiService={wardAPI}
-      redirectPath="/wards"
-    />
-  );
-}
-
-function WardEdit() {
-  return (
-    <EntityEdit
-      entityType="ward"
-      entityConfig={{
-        ...wardConfig,
-        title: 'Edit Ward'
-      }}
-      apiService={wardAPI}
-      redirectPath="/wards"
-    />
-  );
-}
 
 // Sidebar Navigation Component
 function SidebarNav() {
@@ -295,36 +168,9 @@ function SidebarNav() {
           👨‍⚕️ Arzt Dashboard
         </SidebarItem>
       </SidebarSection>
+      </SidebarContainer>
 
-      <SidebarSection>
-        <SidebarSectionTitle>Entitäten verwalten</SidebarSectionTitle>
-        <SidebarItem 
-          to="/patients" 
-          $active={location.pathname === '/patients' || location.pathname === '/' || 
-                   location.pathname.startsWith('/patients/')}
-        >
-          👥 Patienten
-        </SidebarItem>
-        <SidebarItem 
-          to="/doctors" 
-          $active={location.pathname === '/doctors' || location.pathname.startsWith('/doctors/')}
-        >
-          👨‍⚕️ Ärzte
-        </SidebarItem>
-        <SidebarItem 
-          to="/treatments" 
-          $active={location.pathname === '/treatments' || location.pathname.startsWith('/treatments/')}
-        >
-          💊 Behandlungen
-        </SidebarItem>
-        <SidebarItem 
-          to="/wards" 
-          $active={location.pathname === '/wards' || location.pathname.startsWith('/wards/')}
-        >
-          🏥 Stationen
-        </SidebarItem>
-      </SidebarSection>
-    </SidebarContainer>
+      
   );
 }
 
@@ -749,25 +595,7 @@ function App() {
             } />
             <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
 
-            {/* Patient Routes */}
-            <Route path="/patients" element={<PatientsList />} />
-            <Route path="/patients/add" element={<PatientAdd />} />
-            <Route path="/patients/edit/:id" element={<PatientEdit />} />
-
-            {/* Doctor Routes */}
-            <Route path="/doctors" element={<DoctorsList />} />
-            <Route path="/doctors/add" element={<DoctorAdd />} />
-            <Route path="/doctors/edit/:id" element={<DoctorEdit />} />
-
-            {/* Treatment Routes */}
-            <Route path="/treatments" element={<TreatmentsList />} />
-            <Route path="/treatments/add" element={<TreatmentAdd />} />
-            <Route path="/treatments/edit/:id" element={<TreatmentEdit />} />
-
-            {/* Ward Routes */}
-            <Route path="/wards" element={<WardsList />} />
-            <Route path="/wards/add" element={<WardAdd />} />
-            <Route path="/wards/edit/:id" element={<WardEdit />} />
+            
           </Routes>
         </Container>
       </Wrapper>

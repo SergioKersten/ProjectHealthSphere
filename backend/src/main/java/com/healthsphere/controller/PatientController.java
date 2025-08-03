@@ -125,7 +125,7 @@ public class PatientController {
         private String email;
         private LocalDate birthdate;
         private String adress;
-        private Integer wardId; // Ward-ID hinzugefügt
+        private Integer wardId;
 
         public String getName() {
             return name;
@@ -190,7 +190,7 @@ public class PatientController {
         private String phonenumber;
         private String email;
         private String adress;
-        private Integer wardId; // Ward-ID hinzugefügt
+        private Integer wardId;
 
         // Getters and Setters
         public String getName() {
