@@ -2,9 +2,10 @@ package com.healthsphere.components;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Objects;
 
-public class Person implements Serializable {
+public class Person implements Serializable, Comparable<Person> {
     private static final long serialVersionUID = 1L;
 
     private long personId;
@@ -27,6 +28,42 @@ public class Person implements Serializable {
     }
 
     @Override
+    public int compareTo(Person other) {
+        if (other == null)
+            return 1;
+
+        // 1. Primär nach Nachname
+        int nameComparison = this.name.compareToIgnoreCase(other.name);
+        if (nameComparison != 0) {
+            return nameComparison;
+        }
+
+        // 2. Sekundär nach Vorname
+        int firstnameComparison = this.firstname.compareToIgnoreCase(other.firstname);
+        if (firstnameComparison != 0) {
+            return firstnameComparison;
+        }
+
+        // 3. Tertiär nach Alter (jüngste zuerst)
+        int thisAge = Period.between(this.birthdate, LocalDate.now()).getYears();
+        int otherAge = Period.between(other.birthdate, LocalDate.now()).getYears();
+        int ageComparison = Integer.compare(thisAge, otherAge);
+        if (ageComparison != 0) {
+            return ageComparison;
+        }
+
+        // 4. Quaternär nach PersonId (für eindeutige Sortierung)
+        return Long.compare(this.personId, other.personId);
+    }
+
+    /**
+     * Hilfsmethode: Berechnet das Alter der Person
+     */
+    public int getAge() {
+        return Period.between(this.birthdate, LocalDate.now()).getYears();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
@@ -39,6 +76,12 @@ public class Person implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(personId);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Person{personId=%d, name='%s', firstname='%s', age=%d, email='%s'}",
+                personId, name, firstname, getAge(), email);
     }
 
     public long getPersonId() {

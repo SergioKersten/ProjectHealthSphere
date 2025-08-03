@@ -2,11 +2,13 @@ package com.healthsphere.components;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.Objects;
 
 import com.healthsphere.manager.PersonManager;
 
-public class Treatment implements Serializable {
+public class Treatment implements Serializable, Comparable<Treatment> {
     private static final long serialVersionUID = 4L;
 
     private int treatmentId;
@@ -23,25 +25,59 @@ public class Treatment implements Serializable {
         this.doctorPersonId = doctorPersonId;
     }
 
-    public void printTreatmentDetails(PersonManager<Patient> patientManager, PersonManager<Employee> employeeManager) {
-        Patient patient = patientManager.findById(patientPersonId);
-        Employee doctor = employeeManager.findById(doctorPersonId);
+    /**
+     * Treatment-Sortierung:
+     * 1. Primär: Nach Datum (neueste zuerst)
+     * 2. Sekundär: Nach Behandlungsart (alphabetisch)
+     * 3. Tertiär: Nach Treatment-ID
+     */
+    @Override
+    public int compareTo(Treatment other) {
+        if (other == null)
+            return 1;
 
-        System.out.println("Treatment ID: " + treatmentId);
-        System.out.println("Date: " + date);
-        System.out.println("Therapy: " + therapy);
-
-        if (patient != null) {
-            System.out.println("Patient: " + patient.getFirstname() + " " + patient.getName());
-        } else {
-            System.out.println("Patient: Not found (ID = " + patientPersonId + ")");
+        // 1. Primär nach Datum (neueste zuerst)
+        int dateComparison = other.date.compareTo(this.date);
+        if (dateComparison != 0) {
+            return dateComparison;
         }
 
-        if (doctor != null) {
-            System.out.println("Doctor: " + doctor.getFirstname() + " " + doctor.getName());
-        } else {
-            System.out.println("Doctor: Not found (ID = " + doctorPersonId + ")");
+        // 2. Sekundär nach Behandlungsart (alphabetisch)
+        int therapyComparison = this.therapy.compareToIgnoreCase(other.therapy);
+        if (therapyComparison != 0) {
+            return therapyComparison;
         }
+
+        // 3. Tertiär nach Treatment ID (bei gleichem Datum und Therapie)
+        return Integer.compare(this.treatmentId, other.treatmentId);
+    }
+
+    // Zusätzliche Comparatoren für verschiedene Sortierungen
+    public static final Comparator<Treatment> BY_DATE_DESC = Comparator
+            .comparing(Treatment::getDate, Comparator.reverseOrder())
+            .thenComparing(Treatment::getTreatmentId);
+
+    public static final Comparator<Treatment> BY_DATE_ASC = Comparator
+            .comparing(Treatment::getDate)
+            .thenComparing(Treatment::getTreatmentId);
+
+    public static final Comparator<Treatment> BY_THERAPY_TYPE = Comparator
+            .comparing(Treatment::getTherapy, String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(Treatment::getDate, Comparator.reverseOrder());
+
+    public static final Comparator<Treatment> BY_PATIENT_THEN_DATE = Comparator
+            .comparing(Treatment::getPatientPersonId)
+            .thenComparing(Treatment::getDate, Comparator.reverseOrder());
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Treatment{id=%d, date=%s, therapy='%s', type='%s', patient=%d, doctor=%d, days=%d}",
+                treatmentId,
+                date,
+                therapy,
+                patientPersonId,
+                doctorPersonId);
     }
 
     @Override

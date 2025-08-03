@@ -1,11 +1,12 @@
 package com.healthsphere.components;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Objects;
 
 import com.healthsphere.manager.PersonManager;
 
-public class Ward implements Serializable {
+public class Ward implements Serializable, Comparable<Ward> {
     private static final long serialVersionUID = 1L;
 
     private int WardId;
@@ -18,6 +19,53 @@ public class Ward implements Serializable {
         this.WardName = WardName;
         this.description = description;
         this.capacity = capacity;
+    }
+
+    public double getOccupancyRate(PersonManager<Patient> patientManager) {
+        if (capacity == 0)
+            return 0.0; // Schutz vor Division durch 0
+        return (double) getCurrentOccupancy(patientManager) / capacity * 100.0;
+    }
+
+    /**
+     * Ward-Sortierung:
+     * 1. Primär: Nach Name (alphabetisch, alle Stationen gleichwertig)
+     * 2. Sekundär: Nach Kapazität (größere zuerst)
+     * 3. Tertiär: Nach ID (für eindeutige Sortierung)
+     */
+    @Override
+    public int compareTo(Ward other) {
+        if (other == null)
+            return 1;
+
+        // 1. Primär nach Name (alphabetisch)
+        int nameComparison = this.WardName.compareToIgnoreCase(other.WardName);
+        if (nameComparison != 0) {
+            return nameComparison;
+        }
+
+        // 2. Sekundär nach Kapazität (größere zuerst)
+        int capacityComparison = Integer.compare(other.capacity, this.capacity);
+        if (capacityComparison != 0) {
+            return capacityComparison;
+        }
+
+        // 3. Tertiär nach ID
+        return Integer.compare(this.WardId, other.WardId);
+    }
+
+    // Zusätzliche Comparatoren
+    public static final Comparator<Ward> BY_CAPACITY_DESC = Comparator
+            .comparing(Ward::getCapacity, Comparator.reverseOrder())
+            .thenComparing(Ward::getWardName, String.CASE_INSENSITIVE_ORDER);
+
+    public static final Comparator<Ward> BY_NAME_ONLY = Comparator
+            .comparing(Ward::getWardName, String.CASE_INSENSITIVE_ORDER);
+
+    public static Comparator<Ward> byOccupancyRate(PersonManager<Patient> patientManager) {
+        return Comparator.<Ward, Double>comparing(
+                w -> w.getOccupancyRate(patientManager),
+                Comparator.reverseOrder());
     }
 
     /**
