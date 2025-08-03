@@ -46,9 +46,7 @@ public class PatientController {
     @PostMapping
     public ResponseEntity<String> createPatient(@RequestBody PatientRequest request) {
         try {
-            long newId = generateUniqueId();
-            Patient patient = new Patient(
-                    newId, // Automatisch generierte ID
+            boolean added = patientManager.addPatientWithAutoId(
                     request.getName(),
                     request.getFirstname(),
                     request.getPhonenumber(),
@@ -57,33 +55,17 @@ public class PatientController {
                     request.getAdress(),
                     request.getWardId());
 
-            boolean added = patientManager.addPerson(patient);
             if (added) {
                 return ResponseEntity.status(HttpStatus.CREATED)
                         .body("Patient erfolgreich erstellt");
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Patient mit dieser ID existiert bereits");
+                        .body("Patient konnte nicht erstellt werden");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Fehler beim Erstellen des Patienten: " + e.getMessage());
         }
-    }
-
-    private long generateUniqueId() {
-        Set<Patient> allPatients = patientManager.getAll();
-        if (allPatients.isEmpty()) {
-            return 1;
-        }
-
-        // Finde die höchste existierende ID und füge 1 hinzu
-        long maxId = allPatients.stream()
-                .mapToLong(Patient::getPersonId)
-                .max()
-                .orElse(0);
-
-        return maxId + 1;
     }
 
     @PutMapping("/{id}")

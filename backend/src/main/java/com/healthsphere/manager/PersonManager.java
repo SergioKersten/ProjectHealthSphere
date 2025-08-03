@@ -1,5 +1,6 @@
 package com.healthsphere.manager;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -41,6 +42,35 @@ public class PersonManager<T extends Person> {
         if (autoSaveEnabled && filename != null) {
             SerializationManager.saveToFile(personenSet, filename);
         }
+    }
+
+    public boolean addPersonWithAutoId(String name, String firstname, String phonenumber,
+            String email, LocalDate birthdate, String adress,
+            String department, Integer wardId) {
+        long newId = generateUniquePersonId();
+
+        @SuppressWarnings("unchecked")
+        T person = (T) new Employee(newId, name, firstname, phonenumber, email, birthdate, adress, department, wardId);
+        return addPerson(person);
+    }
+
+    public boolean addPatientWithAutoId(String name, String firstname, String phonenumber,
+            String email, LocalDate birthdate, String adress, Integer wardId) {
+        long newId = generateUniquePersonId();
+
+        @SuppressWarnings("unchecked")
+        T person = (T) new Patient(newId, name, firstname, phonenumber, email, birthdate, adress, wardId);
+        return addPerson(person);
+    }
+
+    private long generateUniquePersonId() {
+        if (personenSet.isEmpty()) {
+            return 1;
+        }
+        return personenSet.stream()
+                .mapToLong(Person::getPersonId)
+                .max()
+                .orElse(0) + 1;
     }
 
     // Add a new person - MIT Kapazitätsprüfung für Patienten

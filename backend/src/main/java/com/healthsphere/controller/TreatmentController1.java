@@ -69,41 +69,23 @@ public class TreatmentController1 {
     @PostMapping
     public ResponseEntity<String> createTreatment(@RequestBody TreatmentRequest request) {
         try {
-            // Automatische ID-Generierung
-            int newId = generateUniqueTreatmentId();
-            Treatment treatment = new Treatment(
-                    newId, // Automatisch generierte ID
+            boolean added = treatmentManager.addTreatmentWithAutoId(
                     request.getDate(),
                     request.getTherapy(),
                     request.getPatientPersonId(),
                     request.getDoctorPersonId());
 
-            boolean added = treatmentManager.addTreatment(treatment);
             if (added) {
                 return ResponseEntity.status(HttpStatus.CREATED)
-                        .body("Behandlung erfolgreich erstellt mit ID: " + newId);
+                        .body("Behandlung erfolgreich erstellt");
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Behandlung mit dieser ID existiert bereits");
+                        .body("Behandlung konnte nicht erstellt werden");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Fehler beim Erstellen der Behandlung: " + e.getMessage());
         }
-    }
-
-    private int generateUniqueTreatmentId() {
-        Set<Treatment> allTreatments = treatmentManager.getAll();
-        if (allTreatments.isEmpty()) {
-            return 1;
-        }
-
-        int maxId = allTreatments.stream()
-                .mapToInt(Treatment::getTreatmentId)
-                .max()
-                .orElse(0);
-
-        return maxId + 1;
     }
 
     @PutMapping("/{id}")

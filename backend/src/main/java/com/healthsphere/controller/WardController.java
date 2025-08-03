@@ -54,40 +54,22 @@ public class WardController {
     @PostMapping
     public ResponseEntity<String> createWard(@RequestBody WardRequest request) {
         try {
-            // Automatische ID-Generierung
-            int newId = generateUniqueWardId();
-            Ward ward = new Ward(
-                    newId, // Automatisch generierte ID
+            boolean added = wardManager.addWardWithAutoId(
                     request.getWardName(),
                     request.getDescription(),
                     request.getCapacity());
 
-            boolean added = wardManager.addWard(ward);
             if (added) {
                 return ResponseEntity.status(HttpStatus.CREATED)
-                        .body("Station erfolgreich erstellt mit ID: " + newId);
+                        .body("Station erfolgreich erstellt");
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Station mit dieser ID existiert bereits");
+                        .body("Station konnte nicht erstellt werden");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Fehler beim Erstellen der Station: " + e.getMessage());
         }
-    }
-
-    private int generateUniqueWardId() {
-        Set<Ward> allWards = wardManager.getAll();
-        if (allWards.isEmpty()) {
-            return 1;
-        }
-
-        int maxId = allWards.stream()
-                .mapToInt(Ward::getWardId)
-                .max()
-                .orElse(0);
-
-        return maxId + 1;
     }
 
     @PutMapping("/{id}")
