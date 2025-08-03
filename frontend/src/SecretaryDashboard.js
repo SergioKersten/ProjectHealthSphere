@@ -652,7 +652,6 @@ function SecretaryDashboard() {
     wardId: '',
     // Doctor fields
     department: '',
-    salary: '',
     // Treatment fields
     date: '',
     therapy: '',
@@ -745,7 +744,6 @@ function SecretaryDashboard() {
       adress: '',
       wardId: '',
       department: '',
-      salary: '',
       date: '',
       therapy: '',
       patientPersonId: '',
@@ -801,7 +799,6 @@ function SecretaryDashboard() {
       if (modalType === 'patient') {
         data.wardId = data.wardId ? parseInt(data.wardId) : null;
       } else if (modalType === 'doctor') {
-        data.salary = data.salary ? parseFloat(data.salary) : null;
         data.wardId = data.wardId ? parseInt(data.wardId) : null;
       } else if (modalType === 'treatment') {
         data.treatmentId = data.treatmentId ? parseInt(data.treatmentId) : undefined;
@@ -1796,15 +1793,7 @@ const loadWardCapacities = async () => {
                     onChange={(e) => handleFormChange('email', e.target.value)}
                   />
                 </FormGroup>
-                <FormGroup>
-                  <FormLabel>Gehalt</FormLabel>
-                  <FormInput
-                    type="number"
-                    step="0.01"
-                    value={formData.salary}
-                    onChange={(e) => handleFormChange('salary', e.target.value)}
-                  />
-                </FormGroup>
+        
                 <FormGroup>
                   <FormLabel>Station</FormLabel>
                   <FormSelect
