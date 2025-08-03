@@ -5,6 +5,8 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.healthsphere.components.Employee;
+import com.healthsphere.components.Patient;
 import com.healthsphere.components.Treatment;
 import com.healthsphere.serialization.SerializationManager;
 
@@ -100,7 +102,6 @@ public class TreatmentManager {
         return false;
     }
 
-    // Neue Methode ohne ID-Parameter
     public boolean addTreatmentWithAutoId(LocalDate date, String therapy,
             long patientPersonId, long doctorPersonId) {
         int newId = generateUniqueTreatmentId();
@@ -134,4 +135,62 @@ public class TreatmentManager {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("TreatmentManager{\n");
+        sb.append("  filename='").append(filename != null ? filename : "none").append("'\n");
+        sb.append("  autoSaveEnabled=").append(autoSaveEnabled).append("\n");
+        sb.append("  totalTreatments=").append(treatmentSet.size()).append("\n");
+
+        if (!treatmentSet.isEmpty()) {
+            sb.append("  treatments=[\n");
+
+            // Sortiere Treatments nach ID für bessere Übersicht
+            treatmentSet.stream()
+                    .sorted((t1, t2) -> Integer.compare(t1.getTreatmentId(), t2.getTreatmentId()))
+                    .forEach(treatment -> {
+                        try {
+                            // Versuche Patient und Doctor Namen zu laden
+                            PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
+                            PersonManager<Employee> employeeManager = new PersonManager<>("employees.ser");
+
+                            Patient patient = patientManager.findById(treatment.getPatientPersonId());
+                            Employee doctor = employeeManager.findById(treatment.getDoctorPersonId());
+
+                            String patientName = patient != null ? patient.getFirstname() + " " + patient.getName()
+                                    : "Unknown (ID:" + treatment.getPatientPersonId() + ")";
+
+                            String doctorName = doctor != null ? doctor.getFirstname() + " " + doctor.getName()
+                                    : "Unknown (ID:" + treatment.getDoctorPersonId() + ")";
+
+                            sb.append("    Treatment{")
+                                    .append("id=").append(treatment.getTreatmentId())
+                                    .append(", date=").append(treatment.getDate())
+                                    .append(", therapy='").append(treatment.getTherapy()).append("'")
+                                    .append(", patient='").append(patientName).append("'")
+                                    .append(", doctor='").append(doctorName).append("'")
+                                    .append("}\n");
+                        } catch (Exception e) {
+                            // Fallback wenn Manager nicht verfügbar sind
+                            sb.append("    Treatment{")
+                                    .append("id=").append(treatment.getTreatmentId())
+                                    .append(", date=").append(treatment.getDate())
+                                    .append(", therapy='").append(treatment.getTherapy()).append("'")
+                                    .append(", patientId=").append(treatment.getPatientPersonId())
+                                    .append(", doctorId=").append(treatment.getDoctorPersonId())
+                                    .append("}\n");
+                        }
+                    });
+
+            sb.append("  ]\n");
+        } else {
+            sb.append("  treatments=[]\n");
+        }
+
+        sb.append("}");
+        return sb.toString();
+    }
+
 }

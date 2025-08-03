@@ -347,4 +347,54 @@ public class WardManager {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("WardManager{\n");
+        sb.append("  filename='").append(filename != null ? filename : "none").append("'\n");
+        sb.append("  autoSaveEnabled=").append(autoSaveEnabled).append("\n");
+        sb.append("  totalWards=").append(wardSet.size()).append("\n");
+
+        if (!wardSet.isEmpty()) {
+            sb.append("  wards=[\n");
+
+            // Sortiere Wards nach ID für bessere Übersicht
+            wardSet.stream()
+                    .sorted((w1, w2) -> Integer.compare(w1.getWardId(), w2.getWardId()))
+                    .forEach(ward -> {
+                        try {
+                            // Versuche Kapazitätsinformationen zu laden
+                            PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
+                            long currentOccupancy = ward.getCurrentOccupancy(patientManager);
+                            long availableCapacity = ward.getAvailableCapacity(patientManager);
+                            boolean hasCapacity = ward.hasCapacity(patientManager);
+
+                            sb.append("    Ward{")
+                                    .append("id=").append(ward.getWardId())
+                                    .append(", name='").append(ward.getWardName()).append("'")
+                                    .append(", capacity=").append(ward.getCapacity())
+                                    .append(", occupied=").append(currentOccupancy)
+                                    .append(", available=").append(availableCapacity)
+                                    .append(", hasCapacity=").append(hasCapacity)
+                                    .append("}\n");
+                        } catch (Exception e) {
+                            // Fallback wenn PatientManager nicht verfügbar
+                            sb.append("    Ward{")
+                                    .append("id=").append(ward.getWardId())
+                                    .append(", name='").append(ward.getWardName()).append("'")
+                                    .append(", capacity=").append(ward.getCapacity())
+                                    .append(", status=unknown")
+                                    .append("}\n");
+                        }
+                    });
+
+            sb.append("  ]\n");
+        } else {
+            sb.append("  wards=[]\n");
+        }
+
+        sb.append("}");
+        return sb.toString();
+    }
 }

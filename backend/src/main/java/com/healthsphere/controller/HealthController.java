@@ -46,7 +46,8 @@ public class HealthController {
 
             Patient p1 = new Patient(5, "Multi", "Miriam", "12121212121", "m.multi@web.de",
                     LocalDate.of(2002, 12, 2), "Annanas 5");
-            patientManager.addPerson(p1);
+            patientManager.addPatientWithAutoId("Multi", "Miriam", "12121212121",
+                    "m.multi@web.de", LocalDate.of(2002, 12, 2), "Annanas 5", null);
             patientManager.save();
             patientManager.load();
 

@@ -44,31 +44,6 @@ public class PersonManager<T extends Person> {
         }
     }
 
-    // ===== KAPAZITÄTSPRÜFUNG =====
-    @SuppressWarnings("unchecked")
-    private boolean checkWardCapacity(Integer wardId) {
-        if (wardId == null) {
-            return true; // Keine Ward-Zuweisung = immer ok
-        }
-
-        try {
-            WardManager wardManager = new WardManager("wards.ser");
-            Ward ward = wardManager.findById(wardId);
-
-            if (ward == null) {
-                System.err.println("Ward mit ID " + wardId + " nicht gefunden!");
-                return false;
-            }
-
-            // Cast zu PersonManager<Patient> für Ward-Kapazitätsprüfung
-            return ward.hasCapacity((PersonManager<Patient>) this);
-
-        } catch (Exception e) {
-            System.err.println("Fehler bei Kapazitätsprüfung: " + e.getMessage());
-            return false;
-        }
-    }
-
     // ===== ID-GENERIERUNG =====
     private long generateUniquePersonId() {
         if (personenSet.isEmpty()) {
@@ -83,40 +58,112 @@ public class PersonManager<T extends Person> {
     // ===== CREATE METHODEN =====
     public boolean addPatientWithAutoId(String name, String firstname, String phonenumber,
             String email, LocalDate birthdate, String adress, Integer wardId) {
-        long newId = generateUniquePersonId();
 
-        @SuppressWarnings("unchecked")
-        T person = (T) new Patient(newId, name, firstname, phonenumber, email, birthdate, adress, wardId);
-        return addPerson(person);
+        try {
+            long newId = generateUniquePersonId();
+
+            // Sichere Patient-Erstellung
+            Patient patient = new Patient(newId, name, firstname, phonenumber,
+                    email, birthdate, adress, wardId);
+
+            // Type-Safety Check: Stelle sicher, dass T tatsächlich Patient ist
+            if (this.getClass().getSimpleName().contains("Patient") ||
+                    this.filename != null && this.filename.contains("patient")) {
+                @SuppressWarnings("unchecked")
+                T person = (T) patient;
+                return addPerson(person);
+            } else {
+                System.err.println("FEHLER: Versuche Patient zu EmployeeManager hinzuzufügen!");
+                return false;
+            }
+
+        } catch (ClassCastException e) {
+            System.err.println("FEHLER: Cast-Problem bei Patient-Erstellung: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("FEHLER: Unerwarteter Fehler bei Patient-Erstellung: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public boolean addPersonWithAutoId(String name, String firstname, String phonenumber,
             String email, LocalDate birthdate, String adress,
             String department, Integer wardId) {
-        long newId = generateUniquePersonId();
 
-        @SuppressWarnings("unchecked")
-        T person = (T) new Employee(newId, name, firstname, phonenumber, email, birthdate, adress, department, wardId);
-        return addPerson(person);
+        try {
+            long newId = generateUniquePersonId();
+
+            // Sichere Employee-Erstellung ohne problematischen Cast
+            Employee employee = new Employee(newId, name, firstname, phonenumber,
+                    email, birthdate, adress, department, wardId);
+
+            // Type-Safety Check: Stelle sicher, dass T tatsächlich Employee ist
+            if (this.getClass().getSimpleName().contains("Employee") ||
+                    this.filename != null && this.filename.contains("employee")) {
+                @SuppressWarnings("unchecked")
+                T person = (T) employee;
+                return addPerson(person);
+            } else {
+                System.err.println("FEHLER: Versuche Employee zu PatientManager hinzuzufügen!");
+                return false;
+            }
+
+        } catch (ClassCastException e) {
+            System.err.println("FEHLER: Cast-Problem bei Employee-Erstellung: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("FEHLER: Unerwarteter Fehler bei Employee-Erstellung: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public boolean addPerson(T person) {
-        // Kapazitätsprüfung für Patienten
+        // Kapazitätsprüfung NUR für Patienten!
         if (person instanceof Patient) {
             Patient patient = (Patient) person;
             if (patient.getWardId() != null) {
-                if (!checkWardCapacity(patient.getWardId())) {
+                if (!checkWardCapacityForPatient(patient.getWardId())) {
                     System.err.println("FEHLER: Ward " + patient.getWardId() + " hat keine freien Plätze!");
                     return false;
                 }
             }
         }
+        // Für Employee-Objekte wird KEINE Kapazitätsprüfung durchgeführt!
 
         boolean result = personenSet.add(person);
         if (result) {
             autoSave();
         }
         return result;
+    }
+
+    // ===== separate Kapazitätsprüfung für Patienten =====
+    private boolean checkWardCapacityForPatient(Integer wardId) {
+        if (wardId == null) {
+            return true; // Keine Ward-Zuweisung = immer ok
+        }
+
+        try {
+            WardManager wardManager = new WardManager("wards.ser");
+            Ward ward = wardManager.findById(wardId);
+
+            if (ward == null) {
+                System.err.println("Ward mit ID " + wardId + " nicht gefunden!");
+                return false;
+            }
+
+            // Erstelle IMMER einen separaten PatientManager für die Kapazitätsprüfung
+            // Das verhindert alle Cast-Probleme!
+            PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
+            return ward.hasCapacity(patientManager);
+
+        } catch (Exception e) {
+            System.err.println("Fehler bei Kapazitätsprüfung: " + e.getMessage());
+            e.printStackTrace(); // Für Debugging
+            return false;
+        }
     }
 
     // ===== READ METHODEN =====
@@ -144,16 +191,26 @@ public class PersonManager<T extends Person> {
             return false;
         }
 
-        // Kapazitätsprüfung für Patienten
+        // Kapazitätsprüfung NUR für Patienten!
         if (updatedPerson instanceof Patient) {
             Patient updatedPatient = (Patient) updatedPerson;
             if (updatedPatient.getWardId() != null) {
-                if (!checkWardCapacity(updatedPatient.getWardId())) {
-                    System.err.println("FEHLER: Ward " + updatedPatient.getWardId() + " hat keine freien Plätze!");
+                // Prüfe nur bei Ward-Wechsel oder bei neuer Ward-Zuweisung
+                Patient existingPatient = (Patient) existingPerson;
+                Integer oldWardId = existingPatient.getWardId();
+                Integer newWardId = updatedPatient.getWardId();
+
+                boolean wardChanged = (oldWardId == null && newWardId != null) ||
+                        (oldWardId != null && !oldWardId.equals(newWardId));
+
+                // HIER WAR DER FEHLER: checkWardCapacity() -> checkWardCapacityForPatient()
+                if (wardChanged && !checkWardCapacityForPatient(newWardId)) {
+                    System.err.println("FEHLER: Ward " + newWardId + " hat keine freien Plätze!");
                     return false;
                 }
             }
         }
+        // Für Employee-Updates wird KEINE Kapazitätsprüfung durchgeführt!
 
         // Person ersetzen
         personenSet.remove(existingPerson);
@@ -243,5 +300,32 @@ public class PersonManager<T extends Person> {
                 this.personenSet = loadedSet;
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("PersonManager{\n");
+        sb.append("  filename='").append(filename != null ? filename : "none").append("'\n");
+        sb.append("  autoSaveEnabled=").append(autoSaveEnabled).append("\n");
+        sb.append("  totalPersons=").append(personenSet.size()).append("\n");
+
+        if (!personenSet.isEmpty()) {
+            // Bestimme den Typ der ersten Person für die Anzeige
+            T firstPerson = personenSet.iterator().next();
+            String personType = firstPerson.getClass().getSimpleName();
+            sb.append("  personType='").append(personType).append("'\n");
+
+            sb.append("  persons=[\n");
+            for (T person : personenSet) {
+                sb.append("    ").append(person.toString()).append("\n");
+            }
+            sb.append("  ]\n");
+        } else {
+            sb.append("  persons=[]\n");
+        }
+
+        sb.append("}");
+        return sb.toString();
     }
 }
