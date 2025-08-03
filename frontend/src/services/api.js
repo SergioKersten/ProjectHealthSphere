@@ -55,6 +55,8 @@ export const wardAPI = {
   create: (ward) => api.post('/wards', ward),
   update: (id, ward) => api.put(`/wards/${id}`, ward),
   delete: (id) => api.delete(`/wards/${id}`),
+  getCapacity: (id) => api.get(`/wards/${id}/capacity`),
+  getAllCapacities: () => api.get('/wards/capacity/all'),
 };
 
 export default api;

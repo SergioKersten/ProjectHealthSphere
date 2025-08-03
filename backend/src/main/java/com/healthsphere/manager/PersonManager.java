@@ -1,6 +1,5 @@
 package com.healthsphere.manager;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -9,6 +8,7 @@ import java.util.stream.Collectors;
 import com.healthsphere.components.Employee;
 import com.healthsphere.components.Patient;
 import com.healthsphere.components.Person;
+import com.healthsphere.components.Ward;
 import com.healthsphere.serialization.SerializationManager;
 
 public class PersonManager<T extends Person> {
@@ -43,20 +43,31 @@ public class PersonManager<T extends Person> {
         }
     }
 
-    // Add a new person
+    // Add a new person - MIT Kapazitätsprüfung für Patienten
     public boolean addPerson(T person) {
-        boolean result = personenSet.add(person); // returns false if Person with same ID already exists
+        // Kapazitätsprüfung nur für Patienten mit Ward-Zuweisung
+        if (person instanceof Patient) {
+            Patient patient = (Patient) person;
+            if (patient.getWardId() != null) {
+                if (!checkWardCapacity(patient.getWardId())) {
+                    System.err.println("FEHLER: Ward " + patient.getWardId() + " hat keine freien Plätze!");
+                    return false;
+                }
+            }
+        }
+
+        boolean result = personenSet.add(person);
         if (result) {
-            autoSave(); // Speichern nur bei erfolgreicher Änderung
+            autoSave();
         }
         return result;
     }
 
-    // Remove a person by ID
+    // Delete a person by ID
     public boolean deletePerson(long personId) {
         boolean result = personenSet.removeIf(p -> p.getPersonId() == personId);
         if (result) {
-            autoSave(); // Speichern nur bei erfolgreicher Änderung
+            autoSave();
         }
         return result;
     }
@@ -92,7 +103,7 @@ public class PersonManager<T extends Person> {
             if (newAdress != null)
                 person.setAdress(newAdress);
 
-            autoSave(); // Speichern nach Update
+            autoSave();
             return true;
         }
         return false;
@@ -102,35 +113,45 @@ public class PersonManager<T extends Person> {
         T person = findById(personId);
         if (person instanceof Employee) {
             ((Employee) person).setDepartment(newDepartment);
-            autoSave(); // Speichern nach Update
+            autoSave();
             return true;
         }
         return false;
     }
 
-    // Neue Methode: Ward-Zuweisung für Patienten updaten
+    // Ward-Zuweisung für Patienten - MIT Kapazitätsprüfung
     public boolean updatePatientWard(long personId, Integer wardId) {
         T person = findById(personId);
         if (person instanceof Patient) {
-            ((Patient) person).setWardId(wardId);
-            autoSave(); // Speichern nach Update
+            Patient patient = (Patient) person;
+
+            // Kapazitätsprüfung nur wenn neue Ward zugewiesen wird
+            if (wardId != null && !wardId.equals(patient.getWardId())) {
+                if (!checkWardCapacity(wardId)) {
+                    System.err.println("FEHLER: Ward " + wardId + " hat keine freien Plätze!");
+                    return false;
+                }
+            }
+
+            patient.setWardId(wardId);
+            autoSave();
             return true;
         }
         return false;
     }
 
-    // Neue Methode: Ward-Zuweisung für Mitarbeiter/Ärzte updaten
+    // Ward-Zuweisung für Mitarbeiter/Ärzte updaten
     public boolean updateEmployeeWard(long personId, Integer wardId) {
         T person = findById(personId);
         if (person instanceof Employee) {
             ((Employee) person).setWardId(wardId);
-            autoSave(); // Speichern nach Update
+            autoSave();
             return true;
         }
         return false;
     }
 
-    // Neue Methode: Kombiniertes Update für Employee (Department + Ward)
+    // Kombiniertes Update für Employee (Department + Ward)
     public boolean updateEmployee(long personId, String newName, String newFirstname, String newPhonenumber,
             String newEmail, String newAdress, String newDepartment, Integer newWardId) {
         T person = findById(personId);
@@ -154,17 +175,27 @@ public class PersonManager<T extends Person> {
             if (newWardId != null)
                 employee.setWardId(newWardId);
 
-            autoSave(); // Speichern nach Update
+            autoSave();
             return true;
         }
         return false;
     }
 
-    // Neue Methode: Kombiniertes Update für Patient (Basic + Ward)
+    // Kombiniertes Update für Patient - MIT Kapazitätsprüfung
     public boolean updatePatient(long personId, String newName, String newFirstname, String newPhonenumber,
             String newEmail, String newAdress, Integer newWardId) {
         T person = findById(personId);
         if (person instanceof Patient) {
+            Patient patient = (Patient) person;
+
+            // Kapazitätsprüfung bei Ward-Änderung
+            if (newWardId != null && !newWardId.equals(patient.getWardId())) {
+                if (!checkWardCapacity(newWardId)) {
+                    System.err.println("FEHLER: Ward " + newWardId + " hat keine freien Plätze!");
+                    return false;
+                }
+            }
+
             // Update basic person fields
             if (newName != null)
                 person.setName(newName);
@@ -177,36 +208,59 @@ public class PersonManager<T extends Person> {
             if (newAdress != null)
                 person.setAdress(newAdress);
 
-            // Update patient-specific fields
-            Patient patient = (Patient) person;
+            // Update ward assignment
             if (newWardId != null)
                 patient.setWardId(newWardId);
 
-            autoSave(); // Speichern nach Update
+            autoSave();
             return true;
         }
         return false;
     }
 
-    public Set<T> filter(Predicate<T> criteria) {
-        return personenSet.stream()
-                .filter(criteria)
-                .collect(Collectors.toSet());
+    // Filter persons by given predicate
+    public Set<T> filter(Predicate<T> predicate) {
+        return personenSet.stream().filter(predicate).collect(Collectors.toSet());
     }
 
-    // Manuelles Speichern
+    // Kapazitätsprüfung - Die wichtigste neue Methode!
+    @SuppressWarnings("unchecked")
+    private boolean checkWardCapacity(Integer wardId) {
+        if (wardId == null)
+            return true;
+
+        try {
+            WardManager wardManager = new WardManager("wards.ser");
+            Ward ward = wardManager.findById(wardId);
+
+            if (ward == null) {
+                System.err.println("Ward mit ID " + wardId + " nicht gefunden!");
+                return false;
+            }
+
+            // Cast von PersonManager<T> zu PersonManager<Patient>
+            return ward.hasCapacity((PersonManager<Patient>) this);
+
+        } catch (Exception e) {
+            System.err.println("Fehler bei Kapazitätsprüfung: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Save current state to file
     public void save() {
         if (filename != null) {
             SerializationManager.saveToFile(personenSet, filename);
         }
     }
 
-    // Laden von Datei
+    // Load state from file
+    @SuppressWarnings("unchecked")
     public void load() {
-        if (filename != null && SerializationManager.fileExists(filename)) {
-            Set<T> loadedData = SerializationManager.loadFromFile(filename);
-            if (loadedData != null) {
-                personenSet = loadedData;
+        if (filename != null) {
+            Set<T> loadedSet = SerializationManager.loadFromFile(filename);
+            if (loadedSet != null) {
+                this.personenSet = loadedSet;
             }
         }
     }

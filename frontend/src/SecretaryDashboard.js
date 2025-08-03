@@ -550,6 +550,49 @@ const TreatmentTooltip = styled.div`
   pointer-events: none;
 `;
 
+const CapacityBar = styled.div`
+  width: 100%;
+  height: 20px;
+  background-color: #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0.25rem 0;
+`;
+
+const CapacityFill = styled.div`
+  height: 100%;
+  background-color: ${props => {
+    if (props.$percentage >= 100) return '#dc3545'; // Rot
+    if (props.$percentage >= 80) return '#ffc107';   // Gelb
+    return '#28a745';                                // Grün
+  }};
+  width: ${props => Math.min(props.$percentage, 100)}%;
+  transition: width 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${props => props.$percentage > 50 ? 'white' : 'black'};
+  font-size: 0.75rem;
+  font-weight: bold;
+`;
+
+const StatusBadgeWardCapacity = styled.span`
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: white;
+  background-color: ${props => {
+    switch (props.$status) {
+      case 'available': return '#28a745';
+      case 'nearly-full': return '#ffc107';
+      case 'full': return '#dc3545';
+      default: return '#6c757d';
+    }
+  }};
+`;
+
 function SecretaryDashboard() {
   // State Management
   const [activeTab, setActiveTab] = useState('overview');
@@ -575,6 +618,8 @@ function SecretaryDashboard() {
   const [doctors, setDoctors] = useState([]);
   const [treatments, setTreatments] = useState([]);
   const [wards, setWards] = useState([]);
+  const [wardCapacities, setWardCapacities] = useState([]);
+
   
   // Selected Items
   const [selectedItems, setSelectedItems] = useState([]);
@@ -640,25 +685,30 @@ function SecretaryDashboard() {
   }, [error]);
 
   const loadAllData = async () => {
+  try {
     setLoading(true);
-    try {
-      const [patientsRes, doctorsRes, treatmentsRes, wardsRes] = await Promise.all([
-        patientAPI.getAll(),
-        employeeAPI.getAll(),
-        treatmentAPI.getAll(),
-        wardAPI.getAll()
-      ]);
-      
-      setPatients(patientsRes.data || []);
-      setDoctors(doctorsRes.data || []);
-      setTreatments(treatmentsRes.data || []);
-      setWards(wardsRes.data || []);
-    } catch (err) {
-      setError('Fehler beim Laden der Daten: ' + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setError(null);
+
+    const [patientsRes, doctorsRes, treatmentsRes, wardsRes] = await Promise.all([
+      patientAPI.getAll(),
+      employeeAPI.getAll(),
+      treatmentAPI.getAll(),
+      wardAPI.getAll()
+    ]);
+
+    setPatients(patientsRes.data || patientsRes);
+    setDoctors(doctorsRes.data || doctorsRes);
+    setTreatments(treatmentsRes.data || treatmentsRes);
+    setWards(wardsRes.data || wardsRes);
+    
+    // Ward-Kapazitäten laden
+    await loadWardCapacities();
+  } catch (err) {
+    setError('Fehler beim Laden der Daten: ' + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleFilterChange = (field, value) => {
     setFilters(prev => ({
@@ -871,6 +921,15 @@ function SecretaryDashboard() {
     return ward ? ward.wardName : 'Keine Station';
   };
 
+const loadWardCapacities = async () => {
+  try {
+    const response = await wardAPI.getAllCapacities();
+    setWardCapacities(response.data);
+  } catch (err) {
+    console.error('Fehler beim Laden der Ward-Kapazitäten:', err);
+  }
+};
+
   const renderOverview = () => (
     <div>
       <StatsGrid>
@@ -990,48 +1049,101 @@ function SecretaryDashboard() {
   };
 
   const renderWards = () => {
-    const filteredWards = getFilteredData(wards, 'ward');
-    
-    return (
-      <div>
-        <ActionButtonsRow>
-          <ActionButton $variant="success" onClick={() => openModal('ward', 'add')}>
-            Neue Station hinzufügen
-          </ActionButton>
-        </ActionButtonsRow>
-        
-        <FilterSection>
-          <FilterRow>
-            <FilterInput
-              type="text"
-              placeholder="Suche nach Stationsname..."
-              value={filters.searchTerm}
-              onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-            />
-            <ClearButton onClick={clearFilters}>Filter zurücksetzen</ClearButton>
-          </FilterRow>
-        </FilterSection>
+  const filteredWards = getFilteredData(wards, 'ward');
 
-        <DataTable>
-          <thead>
-            <tr>
-              <TableHeader>Stationsname</TableHeader>
-              <TableHeader>Kapazität</TableHeader>
-              <TableHeader>Beschreibung</TableHeader>
-              <TableHeader>Aktionen</TableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredWards.map(ward => (
+  const getCapacityInfo = (wardId) => {
+    return wardCapacities.find(cap => cap.wardId === wardId);
+  };
+
+  return (
+    <div>
+      <ActionButtonsRow>
+        <ActionButton $variant="success" onClick={() => openModal('ward', 'add')}>
+          Neue Station hinzufügen
+        </ActionButton>
+        
+      </ActionButtonsRow>
+      
+      <FilterSection>
+        <FilterRow>
+          <FilterInput
+            type="text"
+            placeholder="Suche nach Stationsname..."
+            value={filters.searchTerm}
+            onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
+          />
+          <ClearButton onClick={clearFilters}>Filter zurücksetzen</ClearButton>
+        </FilterRow>
+      </FilterSection>
+
+      <DataTable>
+        <thead>
+          <tr>
+            <TableHeader>Station</TableHeader>
+            <TableHeader>Kapazität</TableHeader>
+            <TableHeader>Zugewiesene Patienten</TableHeader>
+            <TableHeader>Aktionen</TableHeader>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredWards.map(ward => {
+            const capacityInfo = getCapacityInfo(ward.wardId);
+
+            return (
               <TableRow key={ward.wardId}>
-                <TableCell>{ward.wardName}</TableCell>
-                <TableCell>{ward.capacity}</TableCell>
-                <TableCell>{ward.description || '-'}</TableCell>
+                <TableCell>
+                  <strong>{ward.wardName}</strong>
+                  <br />
+                  <small style={{color: '#6c757d'}}>{ward.description || '-'}</small>
+                </TableCell>
+                
+                <TableCell>
+                  {capacityInfo ? (
+                    <div>
+                      <strong>{capacityInfo.availableCapacity} freie Plätze</strong>
+                      <br />
+                      <small style={{color: '#6c757d'}}>
+                        von {capacityInfo.totalCapacity} Plätzen insgesamt
+                      </small>
+                    </div>
+                  ) : (
+                    <span style={{color: '#6c757d'}}>Wird geladen...</span>
+                  )}
+                </TableCell>
+                
+                <TableCell>
+                  {capacityInfo && capacityInfo.assignedPatients ? (
+                    capacityInfo.assignedPatients.length > 0 ? (
+                      <div>
+                        {capacityInfo.assignedPatients.map(patient => (
+                          <div key={patient.personId} style={{
+                            fontSize: '0.85rem', 
+                            color: '#495057',
+                            padding: '0.1rem 0',
+                            borderBottom: '1px solid #f8f9fa'
+                          }}>
+                            📋 {patient.firstname} {patient.name}
+                            {patient.email && (
+                              <small style={{color: '#6c757d', marginLeft: '0.5rem'}}>
+                                ({patient.email})
+                              </small>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <small style={{color: '#6c757d', fontStyle: 'italic'}}>
+                        Keine Patienten zugewiesen
+                      </small>
+                    )
+                  ) : null}
+                </TableCell>
+                
                 <TableCell>
                   <ActionButton 
                     $variant="warning"
                     onClick={() => openModal('ward', 'edit', ward)}
-                    style={{marginRight: '0.5rem'}}
+                    style={{marginRight: '0.5rem', marginBottom: '0.25rem'}}
                   >
                     Bearbeiten
                   </ActionButton>
@@ -1043,12 +1155,19 @@ function SecretaryDashboard() {
                   </ActionButton>
                 </TableCell>
               </TableRow>
-            ))}
-          </tbody>
-        </DataTable>
-      </div>
-    );
-  };
+            );
+          })}
+        </tbody>
+      </DataTable>
+      
+      {filteredWards.length === 0 && (
+        <div style={{textAlign: 'center', padding: '2rem', color: '#6c757d'}}>
+          Keine Stationen gefunden.
+        </div>
+      )}
+    </div>
+  );
+};
 
   // Calendar helper functions
   const getDaysInMonth = (date) => {

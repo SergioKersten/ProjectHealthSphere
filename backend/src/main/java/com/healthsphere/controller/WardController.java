@@ -1,5 +1,7 @@
 package com.healthsphere.controller;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
@@ -96,6 +98,21 @@ public class WardController {
             return ResponseEntity.ok("Station erfolgreich gelöscht");
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/capacity")
+    public ResponseEntity<Map<String, Object>> getWardCapacity(@PathVariable int id) {
+        Map<String, Object> capacityData = wardManager.getWardCapacityData(id);
+        if (capacityData != null) {
+            return ResponseEntity.ok(capacityData);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/capacity/all")
+    public ResponseEntity<List<Map<String, Object>>> getAllWardCapacities() {
+        List<Map<String, Object>> allCapacities = wardManager.getAllWardCapacityData();
+        return ResponseEntity.ok(allCapacities);
     }
 
     // DTO Classes

@@ -1,10 +1,15 @@
 package com.healthsphere.manager;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.healthsphere.components.Patient;
 import com.healthsphere.components.Ward;
 import com.healthsphere.serialization.SerializationManager;
 
@@ -74,13 +79,11 @@ public class WardManager {
     }
 
     // Filter wards by given predicate (e.g. capacity, name, etc.)
-    public Set<Ward> filter(Predicate<Ward> criteria) {
-        return wardSet.stream()
-                .filter(criteria)
-                .collect(Collectors.toSet());
+    public Set<Ward> filter(Predicate<Ward> predicate) {
+        return wardSet.stream().filter(predicate).collect(Collectors.toSet());
     }
 
-    // Update ward info by ID
+    // Update a ward by ID
     public boolean updateWard(int wardId, String newName, String newDescription, Integer newCapacity) {
         Ward ward = findById(wardId);
         if (ward != null) {
@@ -91,25 +94,239 @@ public class WardManager {
             if (newCapacity != null)
                 ward.setCapacity(newCapacity);
 
-            autoSave(); // Speichern nach Update
+            autoSave();
             return true;
         }
         return false;
     }
 
-    // Manuelles Speichern
+    // === KAPAZITÄTS-METHODEN ===
+
+    /**
+     * Gibt verfügbare Wards zurück (für Frontend und Console)
+     */
+    public Set<Ward> getAvailableWards() {
+        try {
+            PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
+            return wardSet.stream()
+                    .filter(ward -> ward.hasCapacity(patientManager))
+                    .collect(Collectors.toSet());
+        } catch (Exception e) {
+            System.err.println("Fehler beim Abrufen verfügbarer Wards: " + e.getMessage());
+            return new HashSet<>();
+        }
+    }
+
+    /**
+     * Console-Ausgabe: Alle Ward-Kapazitäten anzeigen
+     */
+    public void showAllWardCapacities() {
+        try {
+            PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
+
+            System.out.println("\n===== WARD-KAPAZITÄTS-ÜBERSICHT =====");
+            System.out.printf("%-20s %-8s %-12s %-8s %-10s%n",
+                    "Ward Name", "ID", "Belegung", "Frei", "Status");
+            System.out.println("------------------------------------------------------------");
+
+            for (Ward ward : wardSet) {
+                long currentOccupancy = ward.getCurrentOccupancy(patientManager);
+                long availableCapacity = ward.getAvailableCapacity(patientManager);
+                String status = ward.hasCapacity(patientManager) ? "Verfügbar" : "Voll";
+
+                System.out.printf("%-20s %-8d %-12s %-8d %-10s%n",
+                        truncate(ward.getWardName(), 20),
+                        ward.getWardId(),
+                        currentOccupancy + "/" + ward.getCapacity(),
+                        availableCapacity,
+                        status);
+            }
+            System.out.println("=====================================\n");
+
+        } catch (Exception e) {
+            System.err.println("Fehler beim Anzeigen der Ward-Kapazitäten: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Console-Ausgabe: Details für eine spezifische Ward
+     */
+    public void showWardDetails(int wardId) {
+        Ward ward = findById(wardId);
+        if (ward == null) {
+            System.err.println("Ward mit ID " + wardId + " nicht gefunden.");
+            return;
+        }
+
+        try {
+            PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
+
+            long currentOccupancy = ward.getCurrentOccupancy(patientManager);
+            long availableCapacity = ward.getAvailableCapacity(patientManager);
+            boolean hasCapacity = ward.hasCapacity(patientManager);
+
+            System.out.println("\n=== WARD-DETAILS ===");
+            System.out.println("Name: " + ward.getWardName());
+            System.out.println("ID: " + ward.getWardId());
+            System.out.println("Beschreibung: " + ward.getDescription());
+            System.out.println("Gesamtkapazität: " + ward.getCapacity() + " Plätze");
+            System.out.println("Aktuelle Belegung: " + currentOccupancy + " Patient(en)");
+            System.out.println("Freie Plätze: " + availableCapacity);
+            System.out.println("Status: " + (hasCapacity ? "Verfügbar" : "Vollständig belegt"));
+
+            // Zugewiesene Patienten auflisten
+            if (currentOccupancy > 0) {
+                System.out.println("\nZugewiesene Patienten:");
+                patientManager.getAll().stream()
+                        .filter(patient -> patient.getWardId() != null)
+                        .filter(patient -> patient.getWardId().equals(ward.getWardId()))
+                        .forEach(patient -> System.out.println("  - " + patient.getFirstname() + " " +
+                                patient.getName() + " (ID: " + patient.getPersonId() + ")"));
+            } else {
+                System.out.println("\nKeine Patienten zugewiesen.");
+            }
+            System.out.println("==================\n");
+
+        } catch (Exception e) {
+            System.err.println("Fehler beim Anzeigen der Ward-Details: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Console-Ausgabe: Nur verfügbare Wards anzeigen
+     */
+    public void showAvailableWards() {
+        Set<Ward> availableWards = getAvailableWards();
+
+        System.out.println("\n===== VERFÜGBARE WARDS =====");
+        if (availableWards.isEmpty()) {
+            System.out.println("Keine Wards mit freien Plätzen verfügbar!");
+        } else {
+            for (Ward ward : availableWards) {
+                try {
+                    PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
+                    long availableCapacity = ward.getAvailableCapacity(patientManager);
+                    System.out.println("- " + ward.getWardName() + " (ID: " + ward.getWardId() +
+                            ") - " + availableCapacity + " freie Plätze");
+                } catch (Exception e) {
+                    System.err.println("Fehler bei Ward " + ward.getWardId());
+                }
+            }
+        }
+        System.out.println("============================\n");
+    }
+
+    // === FRONTEND-DATEN-METHODEN ===
+
+    /**
+     * Gibt Ward-Kapazitätsdaten für Frontend zurück
+     */
+    public Map<String, Object> getWardCapacityData(int wardId) {
+        Ward ward = findById(wardId);
+        if (ward == null) {
+            return null;
+        }
+
+        try {
+            PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("wardId", ward.getWardId());
+            data.put("wardName", ward.getWardName());
+            data.put("description", ward.getDescription());
+            data.put("totalCapacity", ward.getCapacity());
+            data.put("currentOccupancy", ward.getCurrentOccupancy(patientManager));
+            data.put("availableCapacity", ward.getAvailableCapacity(patientManager));
+            data.put("hasCapacity", ward.hasCapacity(patientManager));
+
+            // Zugewiesene Patienten
+            List<Map<String, Object>> assignedPatients = patientManager.getAll().stream()
+                    .filter(patient -> patient.getWardId() != null && patient.getWardId().equals(ward.getWardId()))
+                    .map(patient -> {
+                        Map<String, Object> patientInfo = new HashMap<>();
+                        patientInfo.put("personId", patient.getPersonId());
+                        patientInfo.put("name", patient.getName());
+                        patientInfo.put("firstname", patient.getFirstname());
+                        patientInfo.put("email", patient.getEmail());
+                        return patientInfo;
+                    })
+                    .collect(Collectors.toList());
+
+            data.put("assignedPatients", assignedPatients);
+
+            return data;
+
+        } catch (Exception e) {
+            System.err.println("Fehler beim Abrufen der Ward-Kapazitätsdaten: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Gibt alle Ward-Kapazitätsdaten für Frontend zurück
+     */
+    public List<Map<String, Object>> getAllWardCapacityData() {
+        try {
+            PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
+
+            return wardSet.stream()
+                    .map(ward -> {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("wardId", ward.getWardId());
+                        data.put("wardName", ward.getWardName());
+                        data.put("description", ward.getDescription());
+                        data.put("totalCapacity", ward.getCapacity());
+                        data.put("currentOccupancy", ward.getCurrentOccupancy(patientManager));
+                        data.put("availableCapacity", ward.getAvailableCapacity(patientManager));
+                        data.put("hasCapacity", ward.hasCapacity(patientManager));
+
+                        // Zugewiesene Patienten
+                        List<Map<String, Object>> assignedPatients = patientManager.getAll().stream()
+                                .filter(patient -> patient.getWardId() != null
+                                        && patient.getWardId().equals(ward.getWardId()))
+                                .map(patient -> {
+                                    Map<String, Object> patientInfo = new HashMap<>();
+                                    patientInfo.put("personId", patient.getPersonId());
+                                    patientInfo.put("name", patient.getName());
+                                    patientInfo.put("firstname", patient.getFirstname());
+                                    patientInfo.put("email", patient.getEmail());
+                                    return patientInfo;
+                                })
+                                .collect(Collectors.toList());
+
+                        data.put("assignedPatients", assignedPatients);
+
+                        return data;
+                    })
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            System.err.println("Fehler beim Abrufen aller Ward-Kapazitätsdaten: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    // Helper-Methode für Textkürzung
+    private String truncate(String text, int maxLength) {
+        if (text == null)
+            return "";
+        return text.length() > maxLength ? text.substring(0, maxLength - 3) + "..." : text;
+    }
+
+    // Save current state to file
     public void save() {
         if (filename != null) {
             SerializationManager.saveToFile(wardSet, filename);
         }
     }
 
-    // Laden von Datei
+    // Load state from file
+    @SuppressWarnings("unchecked")
     public void load() {
-        if (filename != null && SerializationManager.fileExists(filename)) {
-            Set<Ward> loadedData = SerializationManager.loadFromFile(filename);
-            if (loadedData != null) {
-                wardSet = loadedData;
+        if (filename != null) {
+            Set<Ward> loadedSet = SerializationManager.loadFromFile(filename);
+            if (loadedSet != null) {
+                this.wardSet = loadedSet;
             }
         }
     }
