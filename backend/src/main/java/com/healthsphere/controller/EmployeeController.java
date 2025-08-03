@@ -53,8 +53,10 @@ public class EmployeeController {
     @PostMapping
     public ResponseEntity<String> createEmployee(@RequestBody EmployeeRequest request) {
         try {
+            // Automatische ID-Generierung
+            long newId = generateUniqueEmployeeId();
             Employee employee = new Employee(
-                    request.getPersonId(),
+                    newId, // Automatisch generierte ID
                     request.getName(),
                     request.getFirstname(),
                     request.getPhonenumber(),
@@ -62,13 +64,12 @@ public class EmployeeController {
                     request.getBirthdate(),
                     request.getAdress(),
                     request.getDepartment(),
-                    request.getWardId() // Ward-ID hinzugefügt
-            );
+                    request.getWardId());
 
             boolean added = employeeManager.addPerson(employee);
             if (added) {
                 return ResponseEntity.status(HttpStatus.CREATED)
-                        .body("Mitarbeiter erfolgreich erstellt");
+                        .body("Mitarbeiter erfolgreich erstellt mit ID: " + newId);
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body("Mitarbeiter mit dieser ID existiert bereits");
@@ -77,6 +78,20 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Fehler beim Erstellen des Mitarbeiters: " + e.getMessage());
         }
+    }
+
+    private long generateUniqueEmployeeId() {
+        Set<Employee> allEmployees = employeeManager.getAll();
+        if (allEmployees.isEmpty()) {
+            return 1;
+        }
+
+        long maxId = allEmployees.stream()
+                .mapToLong(Employee::getPersonId)
+                .max()
+                .orElse(0);
+
+        return maxId + 1;
     }
 
     @PutMapping("/{id}")

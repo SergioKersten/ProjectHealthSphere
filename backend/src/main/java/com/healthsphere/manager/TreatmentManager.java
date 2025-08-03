@@ -1,7 +1,7 @@
 package com.healthsphere.manager;
 
+import java.time.LocalDate;
 import java.util.*;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -98,6 +98,24 @@ public class TreatmentManager {
             return true;
         }
         return false;
+    }
+
+    // Neue Methode ohne ID-Parameter
+    public boolean addTreatmentWithAutoId(LocalDate date, String therapy,
+            long patientPersonId, long doctorPersonId) {
+        int newId = generateUniqueTreatmentId();
+        Treatment treatment = new Treatment(newId, date, therapy, patientPersonId, doctorPersonId);
+        return addTreatment(treatment);
+    }
+
+    private int generateUniqueTreatmentId() {
+        if (treatmentSet.isEmpty()) {
+            return 1;
+        }
+        return treatmentSet.stream()
+                .mapToInt(Treatment::getTreatmentId)
+                .max()
+                .orElse(0) + 1;
     }
 
     // Manuelles Speichern

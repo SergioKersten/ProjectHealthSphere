@@ -45,15 +45,13 @@ public class TreatmentController1 {
 
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<Set<Treatment>> getTreatmentsByPatientId(@PathVariable long patientId) {
-        Set<Treatment> treatments = treatmentManager.filter(t -> 
-            t.getPatientPersonId() == patientId);
+        Set<Treatment> treatments = treatmentManager.filter(t -> t.getPatientPersonId() == patientId);
         return ResponseEntity.ok(treatments);
     }
 
     @GetMapping("/doctor/{doctorId}")
     public ResponseEntity<Set<Treatment>> getTreatmentsByDoctorId(@PathVariable long doctorId) {
-        Set<Treatment> treatments = treatmentManager.filter(t -> 
-            t.getDoctorPersonId() == doctorId);
+        Set<Treatment> treatments = treatmentManager.filter(t -> t.getDoctorPersonId() == doctorId);
         return ResponseEntity.ok(treatments);
     }
 
@@ -61,8 +59,7 @@ public class TreatmentController1 {
     public ResponseEntity<Set<Treatment>> getTreatmentsByDate(@PathVariable String date) {
         try {
             LocalDate searchDate = LocalDate.parse(date);
-            Set<Treatment> treatments = treatmentManager.filter(t -> 
-                t.getDate().equals(searchDate));
+            Set<Treatment> treatments = treatmentManager.filter(t -> t.getDate().equals(searchDate));
             return ResponseEntity.ok(treatments);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -72,40 +69,54 @@ public class TreatmentController1 {
     @PostMapping
     public ResponseEntity<String> createTreatment(@RequestBody TreatmentRequest request) {
         try {
+            // Automatische ID-Generierung
+            int newId = generateUniqueTreatmentId();
             Treatment treatment = new Treatment(
-                request.getTreatmentId(),
-                request.getDate(),
-                request.getTherapy(),
-                request.getPatientPersonId(),
-                request.getDoctorPersonId()
-            );
-            
+                    newId, // Automatisch generierte ID
+                    request.getDate(),
+                    request.getTherapy(),
+                    request.getPatientPersonId(),
+                    request.getDoctorPersonId());
+
             boolean added = treatmentManager.addTreatment(treatment);
             if (added) {
                 return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Behandlung erfolgreich erstellt");
+                        .body("Behandlung erfolgreich erstellt mit ID: " + newId);
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Behandlung mit dieser ID existiert bereits");
+                        .body("Behandlung mit dieser ID existiert bereits");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Fehler beim Erstellen der Behandlung: " + e.getMessage());
+                    .body("Fehler beim Erstellen der Behandlung: " + e.getMessage());
         }
+    }
+
+    private int generateUniqueTreatmentId() {
+        Set<Treatment> allTreatments = treatmentManager.getAll();
+        if (allTreatments.isEmpty()) {
+            return 1;
+        }
+
+        int maxId = allTreatments.stream()
+                .mapToInt(Treatment::getTreatmentId)
+                .max()
+                .orElse(0);
+
+        return maxId + 1;
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateTreatment(
             @PathVariable int id,
             @RequestBody TreatmentUpdateRequest request) {
-        
+
         boolean updated = treatmentManager.updateTreatment(
-            id,
-            request.getTherapy(),
-            request.getPatientPersonId(),
-            request.getDoctorPersonId()
-        );
-        
+                id,
+                request.getTherapy(),
+                request.getPatientPersonId(),
+                request.getDoctorPersonId());
+
         if (updated) {
             return ResponseEntity.ok("Behandlung erfolgreich aktualisiert");
         }
@@ -116,7 +127,7 @@ public class TreatmentController1 {
     public ResponseEntity<String> updateTherapy(
             @PathVariable int id,
             @RequestBody String newTherapy) {
-        
+
         boolean updated = treatmentManager.updateTherapy(id, newTherapy);
         if (updated) {
             return ResponseEntity.ok("Therapie erfolgreich aktualisiert");
@@ -142,16 +153,45 @@ public class TreatmentController1 {
         private long doctorPersonId;
 
         // Getters and Setters
-        public int getTreatmentId() { return treatmentId; }
-        public void setTreatmentId(int treatmentId) { this.treatmentId = treatmentId; }
-        public LocalDate getDate() { return date; }
-        public void setDate(LocalDate date) { this.date = date; }
-        public String getTherapy() { return therapy; }
-        public void setTherapy(String therapy) { this.therapy = therapy; }
-        public long getPatientPersonId() { return patientPersonId; }
-        public void setPatientPersonId(long patientPersonId) { this.patientPersonId = patientPersonId; }
-        public long getDoctorPersonId() { return doctorPersonId; }
-        public void setDoctorPersonId(long doctorPersonId) { this.doctorPersonId = doctorPersonId; }
+        public int getTreatmentId() {
+            return treatmentId;
+        }
+
+        public void setTreatmentId(int treatmentId) {
+            this.treatmentId = treatmentId;
+        }
+
+        public LocalDate getDate() {
+            return date;
+        }
+
+        public void setDate(LocalDate date) {
+            this.date = date;
+        }
+
+        public String getTherapy() {
+            return therapy;
+        }
+
+        public void setTherapy(String therapy) {
+            this.therapy = therapy;
+        }
+
+        public long getPatientPersonId() {
+            return patientPersonId;
+        }
+
+        public void setPatientPersonId(long patientPersonId) {
+            this.patientPersonId = patientPersonId;
+        }
+
+        public long getDoctorPersonId() {
+            return doctorPersonId;
+        }
+
+        public void setDoctorPersonId(long doctorPersonId) {
+            this.doctorPersonId = doctorPersonId;
+        }
     }
 
     public static class TreatmentUpdateRequest {
@@ -160,11 +200,28 @@ public class TreatmentController1 {
         private long doctorPersonId;
 
         // Getters and Setters
-        public String getTherapy() { return therapy; }
-        public void setTherapy(String therapy) { this.therapy = therapy; }
-        public long getPatientPersonId() { return patientPersonId; }
-        public void setPatientPersonId(long patientPersonId) { this.patientPersonId = patientPersonId; }
-        public long getDoctorPersonId() { return doctorPersonId; }
-        public void setDoctorPersonId(long doctorPersonId) { this.doctorPersonId = doctorPersonId; }
+        public String getTherapy() {
+            return therapy;
+        }
+
+        public void setTherapy(String therapy) {
+            this.therapy = therapy;
+        }
+
+        public long getPatientPersonId() {
+            return patientPersonId;
+        }
+
+        public void setPatientPersonId(long patientPersonId) {
+            this.patientPersonId = patientPersonId;
+        }
+
+        public long getDoctorPersonId() {
+            return doctorPersonId;
+        }
+
+        public void setDoctorPersonId(long doctorPersonId) {
+            this.doctorPersonId = doctorPersonId;
+        }
     }
 }

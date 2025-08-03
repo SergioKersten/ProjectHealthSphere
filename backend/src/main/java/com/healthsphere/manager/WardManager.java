@@ -117,6 +117,23 @@ public class WardManager {
         }
     }
 
+    // Neue Methode ohne ID-Parameter
+    public boolean addWardWithAutoId(String wardName, String description, int capacity) {
+        int newId = generateUniqueWardId();
+        Ward ward = new Ward(newId, wardName, description, capacity);
+        return addWard(ward);
+    }
+
+    private int generateUniqueWardId() {
+        if (wardSet.isEmpty()) {
+            return 1;
+        }
+        return wardSet.stream()
+                .mapToInt(Ward::getWardId)
+                .max()
+                .orElse(0) + 1;
+    }
+
     /**
      * Console-Ausgabe: Alle Ward-Kapazitäten anzeigen
      */
