@@ -630,6 +630,15 @@ function SecretaryDashboard() {
   const [modalType, setModalType] = useState('patient'); // 'patient', 'doctor', 'treatment'
   const [editingItem, setEditingItem] = useState(null);
   
+  const loadWardCapacities = async () => {
+  try {
+    const response = await wardAPI.getAllCapacities();
+    setWardCapacities(response.data);
+  } catch (err) {
+    console.error('Fehler beim Laden der Ward-Kapazitäten:', err);
+  }
+};
+  
   // Filter States
   const [filters, setFilters] = useState({
     searchTerm: '',
@@ -728,11 +737,12 @@ function SecretaryDashboard() {
   };
 
   const handleFormChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+    console.log('🔵 Form Change:', field, '=', value); // ← DIESE ZEILE HINZUFÜGEN
+  setFormData(prev => ({
+    ...prev,
+    [field]: value
+  }));
+};
 
   const resetForm = () => {
     setFormData({
@@ -789,6 +799,23 @@ function SecretaryDashboard() {
 
   const handleSubmit = async (e) => {
   e.preventDefault();
+
+if (modalType === 'patient' || modalType === 'doctor') {
+    if (!formData.firstname || !formData.name || !formData.email || !formData.birthdate || !formData.adress) {
+      alert('FEHLER: Bitte alle Pflichtfelder ausfüllen (Vorname, Nachname, E-Mail, Geburtsdatum, Adresse)');
+      setLoading(false);
+      return;
+    }
+    
+    if (modalType === 'doctor' && !formData.department) {
+      alert('FEHLER: Bitte Fachbereich eingeben');
+      setLoading(false);
+      return;
+    }
+  }
+  
+  setLoading(true);
+
   setLoading(true);
   
   try {
@@ -955,15 +982,6 @@ function SecretaryDashboard() {
     const ward = wards.find(w => w.wardId === wardId);
     return ward ? ward.wardName : 'Keine Station';
   };
-
-const loadWardCapacities = async () => {
-  try {
-    const response = await wardAPI.getAllCapacities();
-    setWardCapacities(response.data);
-  } catch (err) {
-    console.error('Fehler beim Laden der Ward-Kapazitäten:', err);
-  }
-};
 
   const renderOverview = () => (
     <div>
@@ -1824,30 +1842,51 @@ const loadWardCapacities = async () => {
                   />
                 </FormGroup>
                 <FormGroup>
-                  <FormLabel>E-Mail</FormLabel>
-                  <FormInput
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleFormChange('email', e.target.value)}
-                  />
-                </FormGroup>
-        
-                <FormGroup>
-                  <FormLabel>Station</FormLabel>
-                  <FormSelect
-                    value={formData.wardId}
-                    onChange={(e) => handleFormChange('wardId', e.target.value)}
-                  >
-                    <option value="">Station auswählen</option>
-                    {wards.map(ward => (
-                      <option key={ward.wardId} value={ward.wardId}>
-                        {ward.wardName}
-                      </option>
-                    ))}
-                  </FormSelect>
-                </FormGroup>
-              </>
-            )}
+      <FormLabel>E-Mail</FormLabel>
+      <FormInput
+        type="email"
+        value={formData.email}
+        onChange={(e) => handleFormChange('email', e.target.value)}
+      />
+    </FormGroup>
+    
+    {/* DIESE 2 FELDER HINZUFÜGEN: */}
+    <FormGroup>
+      <FormLabel>Geburtsdatum *</FormLabel>
+      <FormInput
+        type="date"
+        value={formData.birthdate}
+        onChange={(e) => handleFormChange('birthdate', e.target.value)}
+        required
+      />
+    </FormGroup>
+    
+    <FormGroup>
+      <FormLabel>Adresse *</FormLabel>
+      <FormInput
+        type="text"
+        value={formData.adress}
+        onChange={(e) => handleFormChange('adress', e.target.value)}
+        required
+      />
+    </FormGroup>
+    
+    <FormGroup>
+      <FormLabel>Station</FormLabel>
+      <FormSelect
+        value={formData.wardId}
+        onChange={(e) => handleFormChange('wardId', e.target.value)}
+      >
+        <option value="">Station auswählen</option>
+        {wards.map(ward => (
+          <option key={ward.wardId} value={ward.wardId}>
+            {ward.wardName}
+          </option>
+        ))}
+      </FormSelect>
+    </FormGroup>
+  </>
+)}
 
             {modalType === 'treatment' && (
               <>
