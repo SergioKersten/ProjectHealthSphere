@@ -205,4 +205,25 @@ public class Person implements Serializable, Comparable<Person> {
     public LocalDate getBirthdate() {
         return birthdate;
     }
+
+    /**
+     * TEST-SETTER: Fängt Exceptions ab für normale Tests
+     */
+    public void setNameSafe(String name) {
+        try {
+            setName(name);
+            System.out.println("✅ Name erfolgreich geändert zu: " + name);
+        } catch (Exception e) {
+            System.err.println("⚠️ Name-Änderung fehlgeschlagen: " + e.getMessage());
+        }
+    }
+
+    public void setEmailSafe(String email) {
+        try {
+            setEmail(email);
+            System.out.println("✅ Email erfolgreich geändert zu: " + email);
+        } catch (Exception e) {
+            System.err.println("⚠️ Email-Änderung fehlgeschlagen: " + e.getMessage());
+        }
+    }
 }

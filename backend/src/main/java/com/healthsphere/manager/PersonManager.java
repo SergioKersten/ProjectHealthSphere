@@ -142,6 +142,25 @@ public class PersonManager<T extends Person> {
         return added;
     }
 
+    public boolean deletePerson(long personId) {
+        try {
+            T person = findById(personId);
+            if (person == null) {
+                return false; // Person nicht gefunden
+            }
+
+            boolean result = personenSet.remove(person);
+            if (result) {
+                autoSave();
+            }
+            return result;
+
+        } catch (Exception e) {
+            System.err.println("Fehler beim Löschen der Person: " + e.getMessage());
+            return false;
+        }
+    }
+
     // ===== separate Kapazitätsprüfung für Patienten =====
     private boolean checkWardCapacityForPatient(Integer wardId) {
         if (wardId == null) {
