@@ -788,60 +788,98 @@ function SecretaryDashboard() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
+  
+  try {
+    let response;
+    const data = { ...formData };
     
-    try {
-      let response;
-      const data = { ...formData };
-      
-      // Data transformation based on type
-      if (modalType === 'patient') {
-        data.wardId = data.wardId ? parseInt(data.wardId) : null;
-      } else if (modalType === 'doctor') {
-        data.wardId = data.wardId ? parseInt(data.wardId) : null;
-      } else if (modalType === 'treatment') {
-        data.treatmentId = data.treatmentId ? parseInt(data.treatmentId) : undefined;
-        data.patientPersonId = parseInt(data.patientPersonId);
-        data.doctorPersonId = parseInt(data.doctorPersonId);
-      } else if (modalType === 'ward') {
-        data.wardId = data.wardId ? parseInt(data.wardId) : undefined;
-        data.capacity = parseInt(data.capacity);
-      }
-      
-      if (modalMode === 'add') {
-        if (modalType === 'patient') {
-          response = await patientAPI.create(data);
-        } else if (modalType === 'doctor') {
-          response = await employeeAPI.create(data);
-        } else if (modalType === 'treatment') {
-          response = await treatmentAPI.create(data);
-        } else if (modalType === 'ward') {
-          response = await wardAPI.create(data);
-        }
-        setSuccess(`${modalType === 'patient' ? 'Patient' : modalType === 'doctor' ? 'Arzt' : modalType === 'treatment' ? 'Behandlung' : 'Station'} erfolgreich hinzugefügt!`);
-      } else if (modalMode === 'edit') {
-        const id = editingItem.personId || editingItem.treatmentId || editingItem.wardId;
-        if (modalType === 'patient') {
-          response = await patientAPI.update(id, data);
-        } else if (modalType === 'doctor') {
-          response = await employeeAPI.update(id, data);
-        } else if (modalType === 'treatment') {
-          response = await treatmentAPI.update(id, data);
-        } else if (modalType === 'ward') {
-          response = await wardAPI.update(id, data);
-        }
-        setSuccess(`${modalType === 'patient' ? 'Patient' : modalType === 'doctor' ? 'Arzt' : modalType === 'treatment' ? 'Behandlung' : 'Station'} erfolgreich aktualisiert!`);
-      }
-      
-      await loadAllData();
-      closeModal();
-    } catch (err) {
-      setError('Fehler beim Speichern: ' + err.message);
-    } finally {
-      setLoading(false);
+    // DEBUG: Log what we're sending
+    console.log('Modal Type:', modalType);
+    console.log('Modal Mode:', modalMode);
+    console.log('Form Data before transformation:', formData);
+    
+    // Data transformation
+    if (modalType === 'patient') {
+      data.wardId = data.wardId ? parseInt(data.wardId) : null;
+    } else if (modalType === 'doctor') {
+      data.wardId = data.wardId ? parseInt(data.wardId) : null;
+    } else if (modalType === 'treatment') {
+      data.treatmentId = data.treatmentId ? parseInt(data.treatmentId) : undefined;
+      data.patientPersonId = parseInt(data.patientPersonId);
+      data.doctorPersonId = parseInt(data.doctorPersonId);
+    } else if (modalType === 'ward') {
+      data.wardId = data.wardId ? parseInt(data.wardId) : undefined;
+      data.capacity = parseInt(data.capacity);
     }
-  };
+    
+    // DEBUG: Log transformed data
+    console.log('Data after transformation:', data);
+    
+    if (modalMode === 'add') {
+      if (modalType === 'patient') {
+        console.log('Creating patient with patientAPI');
+        response = await patientAPI.create(data);
+      } else if (modalType === 'doctor') {
+        console.log('Creating doctor with employeeAPI');
+        response = await employeeAPI.create(data);
+      } else if (modalType === 'treatment') {
+        console.log('Creating treatment with treatmentAPI');
+        response = await treatmentAPI.create(data);
+      } else if (modalType === 'ward') {
+        console.log('Creating ward with wardAPI');
+        response = await wardAPI.create(data);
+      }
+      alert(`${modalType} erfolgreich erstellt!`);
+    } else if (modalMode === 'edit' && editingItem) {
+      const id = editingItem.personId || editingItem.treatmentId || editingItem.wardId;
+      console.log('Editing item with ID:', id);
+      
+      if (modalType === 'patient') {
+        response = await patientAPI.update(id, data);
+      } else if (modalType === 'doctor') {
+        response = await employeeAPI.update(id, data);
+      } else if (modalType === 'treatment') {
+        response = await treatmentAPI.update(id, data);
+      } else if (modalType === 'ward') {
+        response = await wardAPI.update(id, data);
+      }
+      alert(`${modalType} erfolgreich aktualisiert!`);
+    }
+    
+    console.log('API Response:', response);
+    
+    // Schließe Modal und lade Seite neu (quick & dirty)
+    closeModal();
+    window.location.reload();
+    
+  } catch (err) {
+    // Enhanced error handling
+    console.error('Full error object:', err);
+    console.error('Error response:', err.response);
+    console.error('Error message:', err.message);
+    
+    let errorMessage = 'Unbekannter Fehler';
+    
+    if (err.response) {
+      // Backend error
+      console.log('Backend error details:', {
+        status: err.response.status,
+        data: err.response.data,
+        headers: err.response.headers
+      });
+      errorMessage = err.response.data || `HTTP ${err.response.status}`;
+    } else if (err.message) {
+      // Network error
+      errorMessage = err.message;
+    }
+    
+    alert(`FEHLER: ${errorMessage}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDelete = async (id, type) => {
     if (!window.confirm(`Sind Sie sicher, dass Sie diese ${type === 'patient' ? 'Patient' : type === 'doctor' ? 'Arzt' : type === 'treatment' ? 'Behandlung' : 'Station'} löschen möchten?`)) {
