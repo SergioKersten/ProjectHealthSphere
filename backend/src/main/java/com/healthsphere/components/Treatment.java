@@ -72,7 +72,7 @@ public class Treatment implements Serializable, Comparable<Treatment> {
     @Override
     public String toString() {
         return String.format(
-                "Treatment{id=%d, date=%s, therapy='%s', type='%s', patient=%d, doctor=%d, days=%d}",
+                "Treatment{id=%d, date=%s, therapy='%s', patient=%d, doctor=%d}",
                 treatmentId,
                 date,
                 therapy,

@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.healthsphere.Exceptions.PersonExceptions.DuplicatePersonException;
 import com.healthsphere.components.Employee;
 import com.healthsphere.components.Patient;
 import com.healthsphere.components.Person;
@@ -119,24 +120,26 @@ public class PersonManager<T extends Person> {
         }
     }
 
-    public boolean addPerson(T person) {
-        // Kapazitätsprüfung NUR für Patienten!
+    public boolean addPerson(T person) throws DuplicatePersonException {
+        // Duplikatsprüfung
+        if (personenSet.stream().anyMatch(p -> p.getPersonId() == person.getPersonId())) {
+            throw new DuplicatePersonException(person.getPersonId());
+        }
+
+        // Kapazitätsprüfung NUR für Patienten
         if (person instanceof Patient) {
             Patient patient = (Patient) person;
-            if (patient.getWardId() != null) {
-                if (!checkWardCapacityForPatient(patient.getWardId())) {
-                    System.err.println("FEHLER: Ward " + patient.getWardId() + " hat keine freien Plätze!");
-                    return false;
-                }
+            if (patient.getWardId() != null && !checkWardCapacityForPatient(patient.getWardId())) {
+                System.err.println("FEHLER: Ward " + patient.getWardId() + " hat keine freien Plätze!");
+                return false;
             }
         }
-        // Für Employee-Objekte wird KEINE Kapazitätsprüfung durchgeführt!
 
-        boolean result = personenSet.add(person);
-        if (result) {
-            autoSave();
+        boolean added = personenSet.add(person);
+        if (added) {
+            autoSave(); // deine eigene Speichermethode, vermutlich Serialisierung
         }
-        return result;
+        return added;
     }
 
     // ===== separate Kapazitätsprüfung für Patienten =====

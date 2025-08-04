@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
 
+import com.healthsphere.Exceptions.WardExceptions.InvalidWardDataException;
 import com.healthsphere.manager.PersonManager;
 
 public class Ward implements Serializable, Comparable<Ward> {
@@ -14,11 +15,34 @@ public class Ward implements Serializable, Comparable<Ward> {
     private String description;
     private int capacity;
 
-    public Ward(int WardId, String WardName, String description, int capacity) {
+    public Ward(int WardId, String WardName, String description, int capacity)
+            throws InvalidWardDataException {
+        validateWardData(WardId, WardName, capacity);
+
         this.WardId = WardId;
         this.WardName = WardName;
         this.description = description;
         this.capacity = capacity;
+    }
+
+    private void validateWardData(int WardId, String WardName, int capacity)
+            throws InvalidWardDataException {
+        if (WardId <= 0) {
+            throw new InvalidWardDataException("WardId", WardId,
+                    "Ward-ID muss größer als 0 sein");
+        }
+        if (WardName == null || WardName.trim().isEmpty()) {
+            throw new InvalidWardDataException("WardName", WardName,
+                    "Ward-Name darf nicht leer sein");
+        }
+        if (capacity <= 0) {
+            throw new InvalidWardDataException("capacity", capacity,
+                    "Kapazität muss größer als 0 sein");
+        }
+        if (capacity > 100) {
+            throw new InvalidWardDataException("capacity", capacity,
+                    "Kapazität darf nicht größer als 100 sein");
+        }
     }
 
     public double getOccupancyRate(PersonManager<Patient> patientManager) {
@@ -176,13 +200,13 @@ public class Ward implements Serializable, Comparable<Ward> {
             long availableCapacity = getAvailableCapacity(patientManager);
             boolean hasCapacity = hasCapacity(patientManager);
 
-            return String.format("Ward{wardId=%d, wardName='%s', description='%s', capacity=%d, " +
+            return String.format("Ward{wardId=%d, WardName='%s', description='%s', capacity=%d, " +
                     "currentOccupancy=%d, availableCapacity=%d, hasCapacity=%s}",
                     WardId, WardName, description, capacity,
                     currentOccupancy, availableCapacity, hasCapacity);
         } catch (Exception e) {
             // Fallback wenn PatientManager nicht verfügbar
-            return String.format("Ward{wardId=%d, wardName='%s', description='%s', capacity=%d}",
+            return String.format("Ward{wardId=%d, WardName='%s', description='%s', capacity=%d}",
                     WardId, WardName, description, capacity);
         }
     }

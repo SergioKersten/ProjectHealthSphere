@@ -3,25 +3,45 @@ package com.healthsphere.components;
 import java.time.LocalDate;
 import java.util.Comparator;
 
+import com.healthsphere.Exceptions.DateExceptions.InvalidDateTimeException;
+import com.healthsphere.Exceptions.PersonExceptions.InvalidPersonDataException;
+
 public class Employee extends Person {
     private static final long serialVersionUID = 3L;
 
     private String department;
     private Integer wardId; // Ward-Zuweisung für Mitarbeiter/Ärzte
 
+    // Konstruktor ohne Ward-Zuweisung
     public Employee(long personId, String name, String firstname, String phonenumber, String email,
-            LocalDate birthdate, String adress, String department) {
+            LocalDate birthdate, String adress, String department)
+            throws InvalidPersonDataException, InvalidDateTimeException {
         super(personId, name, firstname, phonenumber, email, birthdate, adress);
+        validateEmployeeData(department);
         this.department = department;
-        this.wardId = null; // Standardmäßig keine Ward zugewiesen
+        this.wardId = null;
     }
 
-    // Konstruktor mit Ward-ID
+    // Konstruktor mit Ward-Zuweisung
     public Employee(long personId, String name, String firstname, String phonenumber, String email,
-            LocalDate birthdate, String adress, String department, Integer wardId) {
+            LocalDate birthdate, String adress, String department, Integer wardId)
+            throws InvalidPersonDataException, InvalidDateTimeException {
         super(personId, name, firstname, phonenumber, email, birthdate, adress);
+        validateEmployeeData(department);
         this.department = department;
         this.wardId = wardId;
+    }
+
+    /**
+     * Validierung der Employee-spezifischen Felder
+     */
+    private void validateEmployeeData(String department) throws InvalidPersonDataException {
+        if (department == null || department.trim().isEmpty()) {
+            throw new InvalidPersonDataException("department", department, "Abteilung darf nicht leer sein");
+        }
+        if (department.length() > 100) {
+            throw new InvalidPersonDataException("department", department, "Abteilung darf max. 100 Zeichen lang sein");
+        }
     }
 
     /**
@@ -38,29 +58,26 @@ public class Employee extends Person {
 
         Employee otherEmployee = (Employee) other;
 
-        // 1. Primär nach Abteilung (alphabetisch, alle gleichwertig)
         int deptComparison = this.department.compareToIgnoreCase(otherEmployee.department);
         if (deptComparison != 0) {
             return deptComparison;
         }
 
-        // 2. Sekundär nach Ward-ID
         if (this.wardId != null && otherEmployee.wardId != null) {
             int wardComparison = this.wardId.compareTo(otherEmployee.wardId);
             if (wardComparison != 0) {
                 return wardComparison;
             }
         } else if (this.wardId == null && otherEmployee.wardId != null) {
-            return 1; // this kommt nach other
+            return 1;
         } else if (this.wardId != null && otherEmployee.wardId == null) {
-            return -1; // this kommt vor other
+            return -1;
         }
 
-        // 3. Tertiär nach Person-Sortierung
         return super.compareTo(other);
     }
 
-    // Zusätzliche Comparatoren
+    // Comparatoren
     public static final Comparator<Employee> BY_DEPARTMENT_ONLY = Comparator
             .comparing(Employee::getDepartment, String.CASE_INSENSITIVE_ORDER)
             .thenComparing(Employee::getName, String.CASE_INSENSITIVE_ORDER);
@@ -83,13 +100,13 @@ public class Employee extends Person {
                 getWardId() != null ? "Ward-" + getWardId() : "No Ward");
     }
 
-    // Nur Getter und Setter für Employee-spezifische Felder
-    // (Alle anderen Getter/Setter sind in der Parent-Klasse Person.java)
+    // Getter und Setter
     public String getDepartment() {
         return department;
     }
 
-    public void setDepartment(String department) {
+    public void setDepartment(String department) throws InvalidPersonDataException {
+        validateEmployeeData(department);
         this.department = department;
     }
 
@@ -100,5 +117,4 @@ public class Employee extends Person {
     public void setWardId(Integer wardId) {
         this.wardId = wardId;
     }
-
 }
