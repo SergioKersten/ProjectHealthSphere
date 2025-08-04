@@ -18,6 +18,27 @@ import org.springframework.web.bind.annotation.RestController;
 import com.healthsphere.components.Treatment;
 import com.healthsphere.manager.TreatmentManager;
 
+/**
+ * REST-Controller für die Behandlungsverwaltung im HealthSphere-System.
+ * 
+ * Verwaltet Treatment-Objekte und stellt HTTP-Endpunkte für die Dokumentation
+ * und Verwaltung medizinischer Behandlungen bereit. Verknüpft Patienten
+ * mit behandelnden Ärzten und dokumentiert Therapiemaßnahmen.
+ * 
+ * Kernfunktionalitäten:
+ * - Vollständige CRUD-Operationen für Behandlungen
+ * - Verknüpfung zwischen Patienten und Ärzten über IDs
+ * - Chronologische Behandlungsdokumentation
+ * - Integration mit TreatmentManager für Datenoperationen
+ * 
+ * API-Endpunkte:
+ * - GET /api/treatments - Alle Behandlungen abrufen
+ * - GET /api/treatments/{id} - Spezifische Behandlung abrufen
+ * - POST /api/treatments - Neue Behandlung erstellen
+ * - PUT /api/treatments/{id} - Behandlung aktualisieren
+ * - DELETE /api/treatments/{id} - Behandlung löschen
+ * 
+ */
 @RestController
 @RequestMapping("/api/treatments")
 @CrossOrigin(origins = "*")

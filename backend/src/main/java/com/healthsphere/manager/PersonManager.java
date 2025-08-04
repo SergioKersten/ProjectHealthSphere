@@ -14,6 +14,27 @@ import com.healthsphere.serialization.SerializationManager;
 import com.healthsphere.manager.WardManager;
 import com.healthsphere.components.Ward;
 
+/**
+ * Generische Verwaltungsklasse für alle Personentypen im HealthSphere-System.
+ * 
+ * Der PersonManager implementiert das CRUD-Pattern (Create, Read, Update,
+ * Delete)
+ * für Personen-Objekte und bietet erweiterte Funktionalitäten wie Suche,
+ * Sortierung und automatische Persistierung.
+ * 
+ * Kernfunktionalitäten:
+ * 
+ * Generische Verwaltung von Patient- und Employee-Objekten
+ * Automatische ID-Generierung für neue Personen
+ * Erweiterte Such- und Filterfunktionen
+ * Automatische Serialisierung für Datenpersistenz
+ * Type-Safe Operations mit Generics
+ * 
+ * 
+ * @param <T> Der Personentyp (Patient oder Employee) der verwaltet wird
+ * 
+ */
+
 public class PersonManager<T extends Person> {
     private Set<T> personenSet = new HashSet<>();
     private String filename;
@@ -56,7 +77,22 @@ public class PersonManager<T extends Person> {
                 .orElse(0) + 1;
     }
 
-    // ===== CREATE METHODEN =====
+    /**
+     * Erstellt einen neuen Patienten mit automatischer ID-Generierung.
+     * 
+     * Diese Methode führt Type-Safety-Checks durch und prüft automatisch
+     * die Ward-Kapazität vor der Zuweisung.
+     * 
+     * @param name        Nachname des Patienten
+     * @param firstname   Vorname des Patienten
+     * @param phonenumber Telefonnummer
+     * @param email       E-Mail-Adresse
+     * @param birthdate   Geburtsdatum
+     * @param adress      Wohnadresse
+     * @param wardId      Station für Zuweisung (kann null sein)
+     * 
+     * @return true wenn Patient erfolgreich erstellt und hinzugefügt wurde
+     */
     public boolean addPatientWithAutoId(String name, String firstname, String phonenumber,
             String email, LocalDate birthdate, String adress, Integer wardId) {
 
@@ -88,6 +124,22 @@ public class PersonManager<T extends Person> {
         }
     }
 
+    /**
+     * Erstellt einen neuen Mitarbeiter mit automatischer ID-Generierung.
+     * 
+     * Analog zur Patient-Erstellung mit Type-Safety-Checks für Employee-Manager.
+     * 
+     * @param name        Nachname des Mitarbeiters
+     * @param firstname   Vorname des Mitarbeiters
+     * @param phonenumber Dienstliche Telefonnummer
+     * @param email       Dienstliche E-Mail
+     * @param birthdate   Geburtsdatum
+     * @param adress      Wohnadresse
+     * @param department  Abteilungszugehörigkeit
+     * @param wardId      Arbeitsplatz-Station (kann null sein)
+     * 
+     * @return true wenn Mitarbeiter erfolgreich erstellt wurde
+     */
     public boolean addPersonWithAutoId(String name, String firstname, String phonenumber,
             String email, LocalDate birthdate, String adress,
             String department, Integer wardId) {
@@ -120,6 +172,16 @@ public class PersonManager<T extends Person> {
         }
     }
 
+    /**
+     * Fügt eine Person zum Manager hinzu mit Duplikats- und Kapazitätsprüfung.
+     * 
+     * Überprüft auf Duplikate basierend auf der Personen-ID und führt für Patienten
+     * automatisch eine Ward-Kapazitätsprüfung durch.
+     * 
+     * @param person Die hinzuzufügende Person
+     * @return true wenn Person erfolgreich hinzugefügt wurde
+     * @throws DuplicatePersonException wenn Person bereits existiert
+     */
     public boolean addPerson(T person) throws DuplicatePersonException {
         // Duplikatsprüfung
         if (personenSet.stream().anyMatch(p -> p.getPersonId() == person.getPersonId())) {
@@ -162,6 +224,26 @@ public class PersonManager<T extends Person> {
     }
 
     // ===== separate Kapazitätsprüfung für Patienten =====
+    /***
+     * 
+     * Überprüft die
+     * Kapazität einer
+     * Ward für Patientenzuweisungen.**
+     * Diese interne
+     * Methode erstellt
+     * einen separaten
+     * PatientManager für*
+     * die Kapazitätsprüfung
+     * und verhindert Cast-Probleme.**
+     * 
+     * @param
+     * wardId        ID
+     *               der zu
+     *               prüfenden Station*@return true
+     *               wenn Ward
+     *               verfügbare Kapazität hat
+     */
+
     private boolean checkWardCapacityForPatient(Integer wardId) {
         if (wardId == null) {
             return true; // Keine Ward-Zuweisung = immer ok
@@ -241,14 +323,22 @@ public class PersonManager<T extends Person> {
         return true;
     }
 
-    // KOMPATIBILITÄTS-METHODEN für Controller
-    // =============================================================================
-    // MINIMALER FIX: NUR DIE UPDATEPATIENT/UPDATEEMPLOYEE METHODEN ÄNDERN
-    // =============================================================================
-
-    // ERSETZEN SIE NUR DIESE BEIDEN METHODEN IN IHREM PERSONMANAGER:
-
-    // KOMPATIBILITÄTS-METHODEN für Controller
+    /**
+     * Aktualisiert spezifische Patient-Daten.
+     * 
+     * Kompatibilitätsmethode für Controller-Integration mit selektiver
+     * Aktualisierung einzelner Attribute.
+     * 
+     * @param personId       ID des zu aktualisierenden Patienten
+     * @param newName        Neuer Nachname (null = keine Änderung)
+     * @param newFirstname   Neuer Vorname (null = keine Änderung)
+     * @param newPhonenumber Neue Telefonnummer (null = keine Änderung)
+     * @param newEmail       Neue E-Mail (null = keine Änderung)
+     * @param newAdress      Neue Adresse (null = keine Änderung)
+     * @param newWardId      Neue Ward-ID (null = keine Änderung)
+     * 
+     * @return true wenn Update erfolgreich war
+     */
     public boolean updatePatient(long personId, String newName, String newFirstname,
             String newPhonenumber, String newEmail, String newAdress, Integer newWardId) {
         if (!(this instanceof PersonManager))
@@ -284,6 +374,23 @@ public class PersonManager<T extends Person> {
         }
     }
 
+    /**
+     * Aktualisiert spezifische Employee-Daten.
+     * 
+     * Kompatibilitätsmethode für Controller-Integration mit selektiver
+     * Aktualisierung einzelner Mitarbeiter-Attribute.
+     * 
+     * @param personId       ID des zu aktualisierenden Mitarbeiters
+     * @param newName        Neuer Nachname (null = keine Änderung)
+     * @param newFirstname   Neuer Vorname (null = keine Änderung)
+     * @param newPhonenumber Neue Telefonnummer (null = keine Änderung)
+     * @param newEmail       Neue E-Mail (null = keine Änderung)
+     * @param newAdress      Neue Adresse (null = keine Änderung)
+     * @param newDepartment  Neue Abteilung (null = keine Änderung)
+     * @param newWardId      Neue Ward-ID (null = keine Änderung)
+     * 
+     * @return true wenn Update erfolgreich war
+     */
     public boolean updateEmployee(long personId, String newName, String newFirstname,
             String newPhonenumber, String newEmail, String newAdress,
             String newDepartment, Integer newWardId) {

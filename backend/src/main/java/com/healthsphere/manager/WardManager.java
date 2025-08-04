@@ -13,6 +13,14 @@ import com.healthsphere.components.Patient;
 import com.healthsphere.components.Ward;
 import com.healthsphere.serialization.SerializationManager;
 
+/**
+ * Verwaltungsklasse für Krankenhausstationen im HealthSphere-System.
+ * 
+ * Der WardManager implementiert spezialisierte Funktionen für das
+ * Stationsmanagement inklusive Kapazitätsüberwachung und Integration
+ * mit dem PatientManager für Echtzeit-Belegungsdaten.
+ * 
+ */
 public class WardManager {
     private Set<Ward> wardSet = new HashSet<>();
     private String filename; // Dateiname für automatisches Speichern
@@ -117,7 +125,14 @@ public class WardManager {
         }
     }
 
-    // Neue Methode ohne ID-Parameter
+    /**
+     * Erstellt eine neue Station mit automatischer ID-Generierung.
+     * 
+     * @param wardName    Name der neuen Station
+     * @param description Beschreibung der Station
+     * @param capacity    Maximale Patientenkapazität
+     * @return true wenn Station erfolgreich erstellt wurde
+     */
     public boolean addWardWithAutoId(String wardName, String description, int capacity) {
         try {
             int newId = generateUniqueWardId();
@@ -131,6 +146,11 @@ public class WardManager {
         }
     }
 
+    /**
+     * Generiert eine eindeutige Ward-ID für neue Stationen.
+     * 
+     * @return Neue eindeutige Ward-ID
+     */
     private int generateUniqueWardId() {
         if (wardSet.isEmpty()) {
             return 1;
@@ -142,7 +162,10 @@ public class WardManager {
     }
 
     /**
-     * Console-Ausgabe: Alle Ward-Kapazitäten anzeigen
+     * Zeigt eine formatierte Kapazitätsübersicht aller Stationen in der Konsole.
+     * 
+     * Erstellt eine tabellarische Darstellung mit Ward-Name, ID, Belegung,
+     * freien Plätzen und Status für alle verwalteten Stationen.
      */
     public void showAllWardCapacities() {
         try {

@@ -6,6 +6,34 @@ import java.util.Comparator;
 import com.healthsphere.Exceptions.DateExceptions.InvalidDateTimeException;
 import com.healthsphere.Exceptions.PersonExceptions.InvalidPersonDataException;
 
+/**
+ * Repräsentiert einen Mitarbeiter (Arzt oder Pflegepersonal) im
+ * HealthSphere-System.
+ * 
+ * Die Employee-Klasse erweitert die abstrakte Person-Klasse um
+ * mitarbeiterspezifische
+ * Eigenschaften wie Abteilungszugehörigkeit und Stationszuweisung für
+ * Arbeitsplätze.
+ * 
+ * Zusätzliche Funktionen:
+ * 
+ * Abteilungszuordnung (z.B. Kardiologie, Chirurgie)
+ * Flexible Stationszuweisung für Arbeitsplätze
+ * Sichere Methoden für Abteilungsänderungen
+ * 
+ * 
+ * <strong>Design-Entscheidung:</strong> Ward-ID ist sowohl in Patient als auch
+ * Employee
+ * vorhanden, um zu ermöglichen, dass ein Arzt als Patient in einer anderen
+ * Station
+ * behandelt werden kann, als er beruflich arbeitet.
+ * 
+ * Attribute:
+ * 
+ * department - Abteilungszugehörigkeit des Mitarbeiters
+ * wardId - Arbeitsplatz-Stationszuweisung (nullable)
+ * 
+ */
 public class Employee extends Person {
     private static final long serialVersionUID = 3L;
 

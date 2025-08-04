@@ -7,6 +7,35 @@ import java.util.Objects;
 import com.healthsphere.Exceptions.WardExceptions.InvalidWardDataException;
 import com.healthsphere.manager.PersonManager;
 
+/**
+ * Repräsentiert eine Krankenhaus-Station im HealthSphere-System.
+ * 
+ * Die Ward-Klasse verwaltet Informationen über Krankenhausstationen
+ * inklusive Kapazitätsmanagement und intelligenter Belegungsüberwachung.
+ * 
+ * Kernfunktionalitäten:
+ * 
+ * Grundlegende Stationsinformationen (Name, Beschreibung)
+ * Kapazitätsmanagement mit Echtzeit-Belegungsberechnung
+ * Integration mit PatientManager für automatische Belegungsprüfung
+ * Vergleichsoperationen für Sortierung und Eindeutigkeit
+ *
+ * 
+ * Erweiterte Kapazitätsfunktionen:
+ * 
+ * getCurrentOccupancy() - Aktuelle Belegung berechnen
+ * getAvailableCapacity() - Verfügbare Plätze ermitteln
+ * hasCapacity() - Kapazitätsprüfung für Aufnahmemanagement
+ *
+ * 
+ * Attribute:
+ * 
+ * WardId - Eindeutige Stations-ID
+ * WardName - Name der Station
+ * description - Detaillierte Stationsbeschreibung
+ * capacity - Maximale Patientenkapazität
+ *
+ */
 public class Ward implements Serializable, Comparable<Ward> {
     private static final long serialVersionUID = 1L;
 

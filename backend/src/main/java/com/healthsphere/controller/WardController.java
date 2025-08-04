@@ -19,6 +19,29 @@ import org.springframework.web.bind.annotation.RestController;
 import com.healthsphere.components.Ward;
 import com.healthsphere.manager.WardManager;
 
+/**
+ * REST-Controller für die Stationsverwaltung im HealthSphere-System.
+ * 
+ * Stellt HTTP-Endpunkte für Ward-Management bereit mit erweiterten
+ * Funktionen für Kapazitätsmanagement und Echtzeit-Belegungsüberwachung.
+ * Integriert eng mit dem WardManager für spezialisierte Stationsoperationen.
+ * 
+ * Erweiterte Funktionen:
+ * - Kapazitätsbasierte Filterung (GET /capacity/{minCapacity})
+ * - Echtzeit-Belegungsdaten (GET /{id}/capacity)
+ * - Automatische Ward-ID-Generierung
+ * - Integration mit PatientManager für Belegungsberechnungen
+ * 
+ * API-Endpunkte:
+ * - GET /api/wards - Alle Stationen abrufen
+ * - GET /api/wards/{id} - Spezifische Station abrufen
+ * - GET /api/wards/capacity/{minCapacity} - Stationen nach Mindestkapazität
+ * - GET /api/wards/{id}/capacity - Detaillierte Kapazitätsdaten
+ * - POST /api/wards - Neue Station erstellen
+ * - PUT /api/wards/{id} - Station aktualisieren
+ * - DELETE /api/wards/{id} - Station löschen
+ * 
+ */
 @RestController
 @RequestMapping("/api/wards")
 @CrossOrigin(origins = "*")

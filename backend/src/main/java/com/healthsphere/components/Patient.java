@@ -6,6 +6,27 @@ import java.util.Comparator;
 import com.healthsphere.Exceptions.DateExceptions.InvalidDateTimeException;
 import com.healthsphere.Exceptions.PersonExceptions.InvalidPersonDataException;
 
+/**
+ * Repräsentiert einen Patienten im HealthSphere-System.
+ * 
+ * Die Patient-Klasse erweitert die abstrakte Person-Klasse um
+ * patientenspezifische
+ * Funktionalitäten wie die Zuweisung zu Krankenhausstationen (Wards).
+ * 
+ * Zusätzliche Funktionen:
+ * 
+ * Stationszuweisung über Ward-ID
+ * Flexible Konstruktoren für verschiedene Anwendungsfälle
+ * Spezielle Sortierung nach Station und Personendaten
+ * 
+ * 
+ * Besonderheiten:
+ * 
+ * Zwei Konstruktor-Varianten: mit und ohne Ward-Zuweisung
+ * Integer wardId ermöglicht null-Status (keine Zuweisung)
+ * Test-Konstruktoren für sichere Objekt-Erstellung in Testumgebungen
+ * 
+ */
 public class Patient extends Person {
     private static final long serialVersionUID = 2L;
 

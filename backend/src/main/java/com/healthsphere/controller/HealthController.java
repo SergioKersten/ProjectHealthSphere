@@ -18,6 +18,26 @@ import com.healthsphere.manager.PersonManager;
 import com.healthsphere.manager.TreatmentManager;
 import com.healthsphere.manager.WardManager;
 
+/**
+ * System-Health und Statistik-Controller für das HealthSphere-System.
+ * 
+ * Stellt administrative Endpunkte für Systemüberwachung, Statistiken
+ * und Health-Checks bereit. Wird für Frontend-Dashboards und
+ * Systemmonitoring verwendet.
+ * 
+ * Bereitgestellte Funktionen:
+ * - System-Status-Überwachung mit Zeitstempel
+ * - Gesamtstatistiken aller Systemdaten
+ * - Health-Check-Endpunkt für Verfügbarkeitsprüfung
+ * - Dashboard-Datenversorgung
+ * 
+ * API-Endpunkte:
+ * - GET /api/health/status - Systemstatus und Versionsinformationen
+ * - GET /api/health/statistics - Anzahl aller Entitäten im System
+ * - GET /api/health/ping - Einfacher Verfügbarkeits-Check
+ * 
+ */
+
 @RestController
 @RequestMapping("/api/health")
 @CrossOrigin(origins = "*")

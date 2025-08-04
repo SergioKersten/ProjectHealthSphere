@@ -530,12 +530,7 @@ const CalendarControls = styled.div`
   align-items: center;
 `;
 
-const CalendarViewSelect = styled.select`
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
-`;
+
 
 const TreatmentTooltip = styled.div`
   position: absolute;
@@ -550,49 +545,39 @@ const TreatmentTooltip = styled.div`
   pointer-events: none;
 `;
 
-const CapacityBar = styled.div`
-  width: 100%;
-  height: 20px;
-  background-color: #e9ecef;
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 0.25rem 0;
-`;
 
-const CapacityFill = styled.div`
-  height: 100%;
-  background-color: ${props => {
-    if (props.$percentage >= 100) return '#dc3545'; // Rot
-    if (props.$percentage >= 80) return '#ffc107';   // Gelb
-    return '#28a745';                                // Grün
-  }};
-  width: ${props => Math.min(props.$percentage, 100)}%;
-  transition: width 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${props => props.$percentage > 50 ? 'white' : 'black'};
-  font-size: 0.75rem;
-  font-weight: bold;
-`;
 
-const StatusBadgeWardCapacity = styled.span`
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  color: white;
-  background-color: ${props => {
-    switch (props.$status) {
-      case 'available': return '#28a745';
-      case 'nearly-full': return '#ffc107';
-      case 'full': return '#dc3545';
-      default: return '#6c757d';
-    }
-  }};
-`;
 
+
+/**
+ * Sekretariats-Dashboard für das HealthSphere-System.
+ * 
+ * Zentrale Verwaltungskomponente für Sekretariatsmitarbeiter mit
+ * vollständigem Zugriff auf alle Systemfunktionen. Implementiert
+ * sowohl Übersichts- als auch Detailansichten für alle Fachklassen.
+ * 
+ * Kernfunktionalitäten:
+ * - Multi-Tab-Interface für verschiedene Datenbereiche
+ * - Übersichtsdashboard mit Gesamtstatistiken
+ * - Kalenderansicht für Behandlungstermine
+ * - CRUD-Operationen für alle Entitäten (Patient, Employee, Ward, Treatment)
+ * - Erweiterte Filter- und Suchfunktionen
+ * 
+ * Dashboard-Bereiche:
+ * - Overview: Systemstatistiken und Kalender
+ * - Patients: Patientenverwaltung mit Ward-Zuweisung
+ * - Doctors: Mitarbeiterverwaltung mit Abteilungen
+ * - Wards: Stationsverwaltung mit Kapazitätsmonitoring
+ * - Treatments: Behandlungsdokumentation
+ * 
+ * Besondere Features:
+ * - Echtzeit-Kapazitätsüberwachung für Stationen
+ * - Interaktive Kalenderansicht mit Terminfiltern
+ * - Modale Dialoge für Datenbearbeitung
+ * - Automatische Datenaktualisierung
+ * - Farbcodierte Status-Anzeigen
+ * 
+ */
 function SecretaryDashboard() {
   // State Management
   const [activeTab, setActiveTab] = useState('overview');

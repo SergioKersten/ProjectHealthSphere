@@ -8,6 +8,25 @@ import java.util.Objects;
 import com.healthsphere.Exceptions.DateExceptions.InvalidDateTimeException;
 import com.healthsphere.Exceptions.PersonExceptions.InvalidPersonDataException;
 
+/**
+ * Abstrakte Basisklasse für alle Personen im HealthSphere-System.
+ * 
+ * Diese Klasse definiert die gemeinsamen Eigenschaften und Methoden für alle
+ * Personentypen (Patienten, Mitarbeiter) und implementiert die
+ * Grundfunktionalitäten
+ * wie Vergleichsoperationen und Serialisierung.
+ * 
+ * Gemeinsame Attribute:
+ * 
+ * >Eindeutige Personen-ID
+ * >Persönliche Daten (Name, Vorname, Kontaktdaten)
+ * >Geburtsdatum mit automatischer Altersberechnung
+ * 
+ * 
+ * Design-Entscheidung: Als abstrakte Klasse implementiert, um gemeinsame
+ * Attribute aller Personen bereitzustellen und Code-Duplikation zu vermeiden.
+ * 
+ */
 public class Person implements Serializable, Comparable<Person> {
     private static final long serialVersionUID = 1L;
 

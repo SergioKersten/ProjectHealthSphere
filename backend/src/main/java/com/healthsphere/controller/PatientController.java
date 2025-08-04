@@ -18,6 +18,27 @@ import org.springframework.web.bind.annotation.RestController;
 import com.healthsphere.components.Patient;
 import com.healthsphere.manager.PersonManager;
 
+/**
+ * REST-Controller für die Patientenverwaltung im HealthSphere-System.
+ * 
+ * Dieser Controller stellt HTTP-Endpunkte für alle CRUD-Operationen
+ * (Create, Read, Update, Delete) mit Patienten-Objekten bereit und
+ * integriert mit dem PersonManager für die Datenverwaltung.
+ * 
+ * Kernfunktionalitäten:
+ * - Vollständige REST-API für Patienten (GET, POST, PUT, DELETE)
+ * - Integration mit PersonManager für Datenoperationen
+ * - Automatische JSON-Serialisierung/Deserialisierung
+ * - Ward-Zuweisungsunterstützung mit Kapazitätsprüfung
+ * - CORS-Unterstützung für Frontend-Integration
+ * 
+ * API-Endpunkte:
+ * - GET /api/patients - Alle Patienten abrufen
+ * - GET /api/patients/{id} - Spezifischen Patient abrufen
+ * - POST /api/patients - Neuen Patient erstellen
+ * - PUT /api/patients/{id} - Patient aktualisieren
+ * - DELETE /api/patients/{id} - Patient löschen
+ */
 @RestController
 @RequestMapping("/api/patients")
 @CrossOrigin(origins = "*")

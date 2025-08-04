@@ -8,6 +8,36 @@ import java.util.Objects;
 
 import com.healthsphere.manager.PersonManager;
 
+/**
+ * Repräsentiert eine medizinische Behandlung im HealthSphere-System.
+ * 
+ * Die Treatment-Klasse verknüpft Patienten mit behandelnden Ärzten
+ * und dokumentiert medizinische Maßnahmen mit Datum und Therapiebeschreibung.
+ * 
+ * Kernfunktionalitäten:
+ * 
+ * Verknüpfung von Patient und behandelndem Arzt über IDs
+ * Dokumentation von Behandlungsdatum und Therapiemaßnahmen
+ * Eindeutige Identifikation für Nachverfolgung und Abrechnung
+ * Vergleichsoperationen für chronologische Sortierung
+ * 
+ * 
+ * Sortierung:
+ * 
+ * Primär: Behandlungsdatum (neueste zuerst)
+ * Sekundär: Behandlungs-ID (bei gleichem Datum)
+ * 
+ * 
+ * Attribute:
+ * 
+ * treatmentId - Eindeutige Behandlungs-ID
+ * date - Behandlungsdatum
+ * therapy - Beschreibung der durchgeführten Therapie
+ * patientPersonId - Referenz auf behandelten Patienten
+ * doctorPersonId - Referenz auf behandelnden Arzt
+ * 
+ */
+
 public class Treatment implements Serializable, Comparable<Treatment> {
     private static final long serialVersionUID = 4L;
 

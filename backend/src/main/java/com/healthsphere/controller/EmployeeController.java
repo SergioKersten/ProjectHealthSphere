@@ -18,6 +18,26 @@ import org.springframework.web.bind.annotation.RestController;
 import com.healthsphere.components.Employee;
 import com.healthsphere.manager.PersonManager;
 
+/**
+ * REST-Controller für die Mitarbeiterverwaltung im HealthSphere-System.
+ * 
+ * Verwaltet alle HTTP-Anfragen für Employee-Objekte (Ärzte und Pflegepersonal)
+ * und bietet vollständige CRUD-Funktionalitäten mit Integration in das
+ * PersonManager-System für typsichere Operationen.
+ * 
+ * Besondere Funktionen:
+ * - Abteilungsspezifische Mitarbeiterverwaltung
+ * - Ward-Zuweisungen für Arbeitsplätze
+ * - Department-Updates mit Validierung
+ * - Typsichere Employee-Operationen über PersonManager
+ * 
+ * API-Endpunkte:
+ * - GET /api/employees - Alle Mitarbeiter abrufen
+ * - GET /api/employees/{id} - Spezifischen Mitarbeiter abrufen
+ * - POST /api/employees - Neuen Mitarbeiter erstellen
+ * - PUT /api/employees/{id} - Mitarbeiter aktualisieren (inkl. Ward-ID)
+ * - DELETE /api/employees/{id} - Mitarbeiter löschen
+ */
 @RestController
 @RequestMapping("/api/employees")
 @CrossOrigin(origins = "*")

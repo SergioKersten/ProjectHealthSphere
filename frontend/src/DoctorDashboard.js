@@ -305,6 +305,35 @@ const ActionButton = styled.button`
   }
 `;
 
+
+/**
+ * Arzt-Dashboard für das HealthSphere-System.
+ * 
+ * Spezialisierte Dashboard-Komponente für medizinisches Personal
+ * mit Fokus auf Behandlungsmanagement und patientenbezogene
+ * Informationen. Bietet arztspezifische Ansichten und Workflows.
+ * 
+ * Kernfunktionalitäten:
+ * - Arzt-Auswahl für personalisierte Ansichten
+ * - Behandlungsübersicht nach Arzt gefiltert
+ * - Patientenlisten mit behandlungsrelevanten Informationen
+ * - Erweiterte Filter nach Datum, Patient und Station
+ * - Behandlungsdokumentation und -bearbeitung
+ * 
+ * Arztspezifische Features:
+ * - Dropdown-Auswahl des behandelnden Arztes
+ * - Gefilterte Behandlungslisten nach Arzt-ID
+ * - Chronologische Behandlungshistorie
+ * - Patientendetails mit Stationszuweisungen
+ * - Schnellzugriff auf häufige Operationen
+ * 
+ * UI-Anpassungen:
+ * - Grüne Farbgebung (Unterscheidung zu Secretary Dashboard)
+ * - Vereinfachte Navigation für medizinische Workflows
+ * - Fokus auf behandlungsrelevante Daten
+ * - Optimierte Darstellung für klinische Nutzung
+ * 
+ */
 function DoctorDashboard() {
   // State Management
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
