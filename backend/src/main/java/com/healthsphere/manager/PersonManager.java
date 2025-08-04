@@ -223,6 +223,13 @@ public class PersonManager<T extends Person> {
     }
 
     // KOMPATIBILITÄTS-METHODEN für Controller
+    // =============================================================================
+    // MINIMALER FIX: NUR DIE UPDATEPATIENT/UPDATEEMPLOYEE METHODEN ÄNDERN
+    // =============================================================================
+
+    // ERSETZEN SIE NUR DIESE BEIDEN METHODEN IN IHREM PERSONMANAGER:
+
+    // KOMPATIBILITÄTS-METHODEN für Controller
     public boolean updatePatient(long personId, String newName, String newFirstname,
             String newPhonenumber, String newEmail, String newAdress, Integer newWardId) {
         if (!(this instanceof PersonManager))
@@ -235,19 +242,27 @@ public class PersonManager<T extends Person> {
             return false;
         }
 
-        Patient updatedPatient = new Patient(
-                personId,
-                newName != null ? newName : existingPatient.getName(),
-                newFirstname != null ? newFirstname : existingPatient.getFirstname(),
-                newPhonenumber != null ? newPhonenumber : existingPatient.getPhonenumber(),
-                newEmail != null ? newEmail : existingPatient.getEmail(),
-                existingPatient.getBirthdate(),
-                newAdress != null ? newAdress : existingPatient.getAdress(),
-                newWardId != null ? newWardId : existingPatient.getWardId());
+        try {
+            // Exception-handling hier im Backend!
+            Patient updatedPatient = new Patient(
+                    personId,
+                    newName != null ? newName : existingPatient.getName(),
+                    newFirstname != null ? newFirstname : existingPatient.getFirstname(),
+                    newPhonenumber != null ? newPhonenumber : existingPatient.getPhonenumber(),
+                    newEmail != null ? newEmail : existingPatient.getEmail(),
+                    existingPatient.getBirthdate(),
+                    newAdress != null ? newAdress : existingPatient.getAdress(),
+                    newWardId != null ? newWardId : existingPatient.getWardId());
 
-        @SuppressWarnings("unchecked")
-        T typedPatient = (T) updatedPatient;
-        return updatePerson(personId, typedPatient);
+            @SuppressWarnings("unchecked")
+            T typedPatient = (T) updatedPatient;
+            return updatePerson(personId, typedPatient);
+
+        } catch (Exception e) {
+            // Alle Exceptions im Backend abfangen - keine Weiterleitung!
+            System.err.println("Fehler beim Patient-Update: " + e.getMessage());
+            return false;
+        }
     }
 
     public boolean updateEmployee(long personId, String newName, String newFirstname,
@@ -263,29 +278,28 @@ public class PersonManager<T extends Person> {
             return false;
         }
 
-        Employee updatedEmployee = new Employee(
-                personId,
-                newName != null ? newName : existingEmployee.getName(),
-                newFirstname != null ? newFirstname : existingEmployee.getFirstname(),
-                newPhonenumber != null ? newPhonenumber : existingEmployee.getPhonenumber(),
-                newEmail != null ? newEmail : existingEmployee.getEmail(),
-                existingEmployee.getBirthdate(),
-                newAdress != null ? newAdress : existingEmployee.getAdress(),
-                newDepartment != null ? newDepartment : existingEmployee.getDepartment(),
-                newWardId != null ? newWardId : existingEmployee.getWardId());
+        try {
+            // Exception-handling hier im Backend!
+            Employee updatedEmployee = new Employee(
+                    personId,
+                    newName != null ? newName : existingEmployee.getName(),
+                    newFirstname != null ? newFirstname : existingEmployee.getFirstname(),
+                    newPhonenumber != null ? newPhonenumber : existingEmployee.getPhonenumber(),
+                    newEmail != null ? newEmail : existingEmployee.getEmail(),
+                    existingEmployee.getBirthdate(),
+                    newAdress != null ? newAdress : existingEmployee.getAdress(),
+                    newDepartment != null ? newDepartment : existingEmployee.getDepartment(),
+                    newWardId != null ? newWardId : existingEmployee.getWardId());
 
-        @SuppressWarnings("unchecked")
-        T typedEmployee = (T) updatedEmployee;
-        return updatePerson(personId, typedEmployee);
-    }
+            @SuppressWarnings("unchecked")
+            T typedEmployee = (T) updatedEmployee;
+            return updatePerson(personId, typedEmployee);
 
-    // ===== DELETE METHODEN =====
-    public boolean deletePerson(long personId) {
-        boolean result = personenSet.removeIf(p -> p.getPersonId() == personId);
-        if (result) {
-            autoSave();
+        } catch (Exception e) {
+            // Alle Exceptions im Backend abfangen - keine Weiterleitung!
+            System.err.println("Fehler beim Employee-Update: " + e.getMessage());
+            return false;
         }
-        return result;
     }
 
     // ===== PERSISTIERUNG =====

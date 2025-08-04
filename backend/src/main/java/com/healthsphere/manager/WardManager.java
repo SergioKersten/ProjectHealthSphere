@@ -119,9 +119,16 @@ public class WardManager {
 
     // Neue Methode ohne ID-Parameter
     public boolean addWardWithAutoId(String wardName, String description, int capacity) {
-        int newId = generateUniqueWardId();
-        Ward ward = new Ward(newId, wardName, description, capacity);
-        return addWard(ward);
+        try {
+            int newId = generateUniqueWardId();
+            Ward ward = new Ward(newId, wardName, description, capacity);
+            return addWard(ward);
+
+        } catch (Exception e) {
+            // Alle Exceptions im Backend abfangen - keine Weiterleitung!
+            System.err.println("Fehler beim Erstellen der Ward: " + e.getMessage());
+            return false;
+        }
     }
 
     private int generateUniqueWardId() {
