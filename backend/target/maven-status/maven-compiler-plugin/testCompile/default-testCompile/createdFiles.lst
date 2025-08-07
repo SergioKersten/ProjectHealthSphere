@@ -1,0 +1,5 @@
+com\healthsphere\HealthSphereDomainClassTest.class
+com\healthsphere\HealthSphereExceptionEdgeCaseTest.class
+com\healthsphere\PersistierungTest.class
+com\healthsphere\ManagerToStringTest.class
+com\healthsphere\AppTest.class

@@ -1,0 +1,91 @@
+
+package com.healthsphere.controller;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.healthsphere.components.Employee;
+import com.healthsphere.components.Patient;
+import com.healthsphere.manager.PersonManager;
+import com.healthsphere.manager.TreatmentManager;
+import com.healthsphere.manager.WardManager;
+
+/**
+ * System-Health und Statistik-Controller für das HealthSphere-System.
+ * 
+ * Stellt administrative Endpunkte für Systemüberwachung, Statistiken
+ * und Health-Checks bereit. Wird für Frontend-Dashboards und
+ * Systemmonitoring verwendet.
+ * 
+ * Bereitgestellte Funktionen:
+ * - System-Status-Überwachung mit Zeitstempel
+ * - Gesamtstatistiken aller Systemdaten
+ * - Health-Check-Endpunkt für Verfügbarkeitsprüfung
+ * - Dashboard-Datenversorgung
+ * 
+ * API-Endpunkte:
+ * - GET /api/health/status - Systemstatus und Versionsinformationen
+ * - GET /api/health/statistics - Anzahl aller Entitäten im System
+ * - GET /api/health/ping - Einfacher Verfügbarkeits-Check
+ * 
+ */
+
+@RestController
+@RequestMapping("/api/health")
+@CrossOrigin(origins = "*")
+public class HealthController {
+
+    @GetMapping("/status")
+    public ResponseEntity<Map<String, Object>> getSystemStatus() {
+        Map<String, Object> status = new HashMap<>();
+        status.put("status", "OK");
+        status.put("timestamp", LocalDateTime.now());
+        status.put("application", "HealthSphere Backend");
+        status.put("version", "1.0.0");
+        return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<Map<String, Object>> getSystemStatistics() {
+        Map<String, Object> stats = new HashMap<>();
+
+        try {
+            // Initialize managers to get counts
+            PersonManager<Patient> patientManager = new PersonManager<>("patients.ser");
+            PersonManager<Employee> employeeManager = new PersonManager<>("employees.ser");
+            TreatmentManager treatmentManager = new TreatmentManager("treatments.ser");
+            WardManager wardManager = new WardManager();
+
+            Patient p1 = new Patient(5, "Multi", "Miriam", "12121212121", "m.multi@web.de",
+                    LocalDate.of(2002, 12, 2), "Annanas 5");
+            patientManager.addPatientWithAutoId("Multi", "Miriam", "12121212121",
+                    "m.multi@web.de", LocalDate.of(2002, 12, 2), "Annanas 5", null);
+            patientManager.save();
+            patientManager.load();
+
+            stats.put("totalPatients", patientManager.getAll().size());
+            stats.put("totalEmployees", employeeManager.getAll().size());
+            stats.put("totalTreatments", treatmentManager.getAll().size());
+            stats.put("totalWards", wardManager.getAll().size());
+            stats.put("lastUpdated", LocalDateTime.now());
+
+        } catch (Exception e) {
+            stats.put("error", "Fehler beim Laden der Statistiken: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
+    }
+}
