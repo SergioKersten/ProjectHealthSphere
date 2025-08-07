@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.healthsphere.ManagerToStringTest" time="0.183" tests="6" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.healthsphere.ManagerToStringTest" time="0.142" tests="6" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="24"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -15,9 +15,8 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="DE"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-24\bin"/>
-    <property name="sun.java.command" value="C:\Users\eriks\AppData\Local\Temp\surefire6889705349480693057\surefirebooter-20250803223421902_3.jar C:\Users\eriks\AppData\Local\Temp\surefire6889705349480693057 2025-08-03T22-34-21_823-jvmRun1 surefire-20250803223421902_1tmp surefire_0-20250803223421902_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\eriks\AppData\Local\Temp\surefire12667920778482855994\surefirebooter-20250807235008880_3.jar C:\Users\eriks\AppData\Local\Temp\surefire12667920778482855994 2025-08-07T23-50-08_805-jvmRun1 surefire-20250807235008880_1tmp surefire_0-20250807235008880_2tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="test" value="ManagerToStringTest"/>
     <property name="surefire.test.class.path" value="C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\target\test-classes;C:\Users\eriks\Documents\1. Duales Studium\ProjectHealthSphere\backend\target\classes;C:\Users\eriks\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.2.5\spring-boot-starter-web-3.2.5.jar;C:\Users\eriks\.m2\repository\org\springframework\boot\spring-boot-starter\3.2.5\spring-boot-starter-3.2.5.jar;C:\Users\eriks\.m2\repository\org\springframework\boot\spring-boot\3.2.5\spring-boot-3.2.5.jar;C:\Users\eriks\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.2.5\spring-boot-autoconfigure-3.2.5.jar;C:\Users\eriks\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.2.5\spring-boot-starter-logging-3.2.5.jar;C:\Users\eriks\.m2\repository\ch\qos\logback\logback-classic\1.4.14\logback-classic-1.4.14.jar;C:\Users\eriks\.m2\repository\ch\qos\logback\logback-core\1.4.14\logback-core-1.4.14.jar;C:\Users\eriks\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.21.1\log4j-to-slf4j-2.21.1.jar;C:\Users\eriks\.m2\repository\org\apache\logging\log4j\log4j-api\2.21.1\log4j-api-2.21.1.jar;C:\Users\eriks\.m2\repository\org\slf4j\jul-to-slf4j\2.0.13\jul-to-slf4j-2.0.13.jar;C:\Users\eriks\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\eriks\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\eriks\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.2.5\spring-boot-starter-json-3.2.5.jar;C:\Users\eriks\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.15.4\jackson-datatype-jdk8-2.15.4.jar;C:\Users\eriks\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.4\jackson-datatype-jsr310-2.15.4.jar;C:\Users\eriks\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.15.4\jackson-module-parameter-names-2.15.4.jar;C:\Users\eriks\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.2.5\spring-boot-starter-tomcat-3.2.5.jar;C:\Users\eriks\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.20\tomcat-embed-core-10.1.20.jar;C:\Users\eriks\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.20\tomcat-embed-el-10.1.20.jar;C:\Users\eriks\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.20\tomcat-embed-websocket-10.1.20.jar;C:\Users\eriks\.m2\repository\org\springframework\spring-web\6.1.6\spring-web-6.1.6.jar;C:\Users\eriks\.m2\repository\org\springframework\spring-beans\6.1.6\spring-beans-6.1.6.jar;C:\Users\eriks\.m2\repository\io\micrometer\micrometer-observation\1.12.5\micrometer-observation-1.12.5.jar;C:\Users\eriks\.m2\repository\io\micrometer\micrometer-commons\1.12.5\micrometer-commons-1.12.5.jar;C:\Users\eriks\.m2\repository\org\springframework\spring-webmvc\6.1.6\spring-webmvc-6.1.6.jar;C:\Users\eriks\.m2\repository\org\springframework\spring-aop\6.1.6\spring-aop-6.1.6.jar;C:\Users\eriks\.m2\repository\org\springframework\spring-context\6.1.6\spring-context-6.1.6.jar;C:\Users\eriks\.m2\repository\org\springframework\spring-expression\6.1.6\spring-expression-6.1.6.jar;C:\Users\eriks\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.4\jackson-databind-2.15.4.jar;C:\Users\eriks\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.4\jackson-annotations-2.15.4.jar;C:\Users\eriks\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.4\jackson-core-2.15.4.jar;C:\Users\eriks\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.2.5\spring-boot-starter-test-3.2.5.jar;C:\Users\eriks\.m2\repository\org\springframework\boot\spring-boot-test\3.2.5\spring-boot-test-3.2.5.jar;C:\Users\eriks\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.2.5\spring-boot-test-autoconfigure-3.2.5.jar;C:\Users\eriks\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\eriks\.m2\repository\org\slf4j\slf4j-api\2.0.13\slf4j-api-2.0.13.jar;C:\Users\eriks\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\eriks\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\eriks\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\eriks\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\eriks\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\eriks\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\eriks\.m2\repository\net\bytebuddy\byte-buddy\1.14.13\byte-buddy-1.14.13.jar;C:\Users\eriks\.m2\repository\org\awaitility\awaitility\4.2.1\awaitility-4.2.1.jar;C:\Users\eriks\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\eriks\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.2\junit-jupiter-5.10.2.jar;C:\Users\eriks\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.2\junit-jupiter-api-5.10.2.jar;C:\Users\eriks\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\eriks\.m2\repository\org\junit\platform\junit-platform-commons\1.10.2\junit-platform-commons-1.10.2.jar;C:\Users\eriks\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\eriks\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.2\junit-jupiter-params-5.10.2.jar;C:\Users\eriks\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.2\junit-jupiter-engine-5.10.2.jar;C:\Users\eriks\.m2\repository\org\junit\platform\junit-platform-engine\1.10.2\junit-platform-engine-1.10.2.jar;C:\Users\eriks\.m2\repository\org\mockito\mockito-core\5.7.0\mockito-core-5.7.0.jar;C:\Users\eriks\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.13\byte-buddy-agent-1.14.13.jar;C:\Users\eriks\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\eriks\.m2\repository\org\mockito\mockito-junit-jupiter\5.7.0\mockito-junit-jupiter-5.7.0.jar;C:\Users\eriks\.m2\repository\org\skyscreamer\jsonassert\1.5.1\jsonassert-1.5.1.jar;C:\Users\eriks\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\eriks\.m2\repository\org\springframework\spring-core\6.1.6\spring-core-6.1.6.jar;C:\Users\eriks\.m2\repository\org\springframework\spring-jcl\6.1.6\spring-jcl-6.1.6.jar;C:\Users\eriks\.m2\repository\org\springframework\spring-test\6.1.6\spring-test-6.1.6.jar;C:\Users\eriks\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="C:\Users\eriks"/>
@@ -31,7 +30,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\eriks\AppData\Local\Temp\surefire6889705349480693057\surefirebooter-20250803223421902_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\eriks\AppData\Local\Temp\surefire12667920778482855994\surefirebooter-20250807235008880_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="24.0.1+9-30"/>
@@ -59,7 +58,7 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="68.0"/>
   </properties>
-  <testcase name="testRealWardData" classname="com.healthsphere.ManagerToStringTest" time="0.055">
+  <testcase name="testRealWardData" classname="com.healthsphere.ManagerToStringTest" time="0.042">
     <system-out><![CDATA[
 ============================================================
 SETUP: Lade echte Daten aus dem HealthSphere System
@@ -68,7 +67,7 @@ Daten erfolgreich aus patients.ser geladen.
 Daten erfolgreich aus employees.ser geladen.
 Daten erfolgreich aus wards.ser geladen.
 Daten erfolgreich aus treatments.ser geladen.
-✅ Patienten geladen: 15
+✅ Patienten geladen: 14
 ✅ Mitarbeiter geladen: 11
 ✅ Stationen geladen: 9
 ✅ Behandlungen geladen: 30
@@ -93,7 +92,7 @@ WardManager{
   wards=[
     Ward{id=1, name='Kardiologie', capacity=13, occupied=3, available=10, hasCapacity=true}
     Ward{id=2, name='Chirurgie', capacity=39, occupied=1, available=38, hasCapacity=true}
-    Ward{id=3, name='Innere Medizin', capacity=38, occupied=3, available=35, hasCapacity=true}
+    Ward{id=3, name='Innere Medizin', capacity=38, occupied=2, available=36, hasCapacity=true}
     Ward{id=4, name='Pädiatrie', capacity=37, occupied=0, available=37, hasCapacity=true}
     Ward{id=5, name='Orthopädie', capacity=29, occupied=2, available=27, hasCapacity=true}
     Ward{id=6, name='Neurologie', capacity=49, occupied=0, available=49, hasCapacity=true}
@@ -104,7 +103,7 @@ WardManager{
 }
 ]]></system-out>
   </testcase>
-  <testcase name="testDataQuality" classname="com.healthsphere.ManagerToStringTest" time="0.018">
+  <testcase name="testDataQuality" classname="com.healthsphere.ManagerToStringTest" time="0.01">
     <system-out><![CDATA[
 ============================================================
 SETUP: Lade echte Daten aus dem HealthSphere System
@@ -113,7 +112,7 @@ Daten erfolgreich aus patients.ser geladen.
 Daten erfolgreich aus employees.ser geladen.
 Daten erfolgreich aus wards.ser geladen.
 Daten erfolgreich aus treatments.ser geladen.
-✅ Patienten geladen: 15
+✅ Patienten geladen: 14
 ✅ Mitarbeiter geladen: 11
 ✅ Stationen geladen: 9
 ✅ Behandlungen geladen: 30
@@ -169,10 +168,9 @@ Patient Klein: Station 8 ✅ existiert
 Patient Hartmann: Station 3 ✅ existiert
 Patient Krause: Station 5 ✅ existiert
 Patient Lange: Station 1 ✅ existiert
-Patient Siehr: Station 3 ✅ existiert
 ]]></system-out>
   </testcase>
-  <testcase name="testRealTreatmentData" classname="com.healthsphere.ManagerToStringTest" time="0.069">
+  <testcase name="testRealTreatmentData" classname="com.healthsphere.ManagerToStringTest" time="0.062">
     <system-out><![CDATA[
 ============================================================
 SETUP: Lade echte Daten aus dem HealthSphere System
@@ -181,7 +179,7 @@ Daten erfolgreich aus patients.ser geladen.
 Daten erfolgreich aus employees.ser geladen.
 Daten erfolgreich aus wards.ser geladen.
 Daten erfolgreich aus treatments.ser geladen.
-✅ Patienten geladen: 15
+✅ Patienten geladen: 14
 ✅ Mitarbeiter geladen: 11
 ✅ Stationen geladen: 9
 ✅ Behandlungen geladen: 30
@@ -289,7 +287,7 @@ TreatmentManager{
 }
 ]]></system-out>
   </testcase>
-  <testcase name="testCompleteSystemOverview" classname="com.healthsphere.ManagerToStringTest" time="0.012">
+  <testcase name="testCompleteSystemOverview" classname="com.healthsphere.ManagerToStringTest" time="0.011">
     <system-out><![CDATA[
 ============================================================
 SETUP: Lade echte Daten aus dem HealthSphere System
@@ -298,7 +296,7 @@ Daten erfolgreich aus patients.ser geladen.
 Daten erfolgreich aus employees.ser geladen.
 Daten erfolgreich aus wards.ser geladen.
 Daten erfolgreich aus treatments.ser geladen.
-✅ Patienten geladen: 15
+✅ Patienten geladen: 14
 ✅ Mitarbeiter geladen: 11
 ✅ Stationen geladen: 9
 ✅ Behandlungen geladen: 30
@@ -314,7 +312,7 @@ TEST 5: VOLLSTÄNDIGE SYSTEM-ÜBERSICHT MIT ECHTEN DATEN
 --------------------------------------------------
 🏥 Kardiologie     | Kapazität: 13 | Belegt:  3 | Frei: 10 | Auslastung: 23,1%
 🏥 Chirurgie       | Kapazität: 39 | Belegt:  1 | Frei: 38 | Auslastung: 2,6%
-🏥 Innere Medizin  | Kapazität: 38 | Belegt:  3 | Frei: 35 | Auslastung: 7,9%
+🏥 Innere Medizin  | Kapazität: 38 | Belegt:  2 | Frei: 36 | Auslastung: 5,3%
 🏥 Pädiatrie       | Kapazität: 37 | Belegt:  0 | Frei: 37 | Auslastung: 0,0%
 🏥 Orthopädie      | Kapazität: 29 | Belegt:  2 | Frei: 27 | Auslastung: 6,9%
 🏥 Neurologie      | Kapazität: 49 | Belegt:  0 | Frei: 49 | Auslastung: 0,0%
@@ -324,12 +322,12 @@ TEST 5: VOLLSTÄNDIGE SYSTEM-ÜBERSICHT MIT ECHTEN DATEN
 
 📊 BEHANDLUNGSSTATISTIKEN (LIVE):
 --------------------------------------------------
-📅 Behandlungen heute: 1
-📅 Behandlungen diese Woche: 14
+📅 Behandlungen heute: 0
+📅 Behandlungen diese Woche: 11
 📅 Behandlungen gesamt: 30
 ]]></system-out>
   </testcase>
-  <testcase name="testRealPatientData" classname="com.healthsphere.ManagerToStringTest" time="0.005">
+  <testcase name="testRealPatientData" classname="com.healthsphere.ManagerToStringTest" time="0.008">
     <system-out><![CDATA[
 ============================================================
 SETUP: Lade echte Daten aus dem HealthSphere System
@@ -338,7 +336,7 @@ Daten erfolgreich aus patients.ser geladen.
 Daten erfolgreich aus employees.ser geladen.
 Daten erfolgreich aus wards.ser geladen.
 Daten erfolgreich aus treatments.ser geladen.
-✅ Patienten geladen: 15
+✅ Patienten geladen: 14
 ✅ Mitarbeiter geladen: 11
 ✅ Stationen geladen: 9
 ✅ Behandlungen geladen: 30
@@ -350,29 +348,28 @@ PATIENTEN-DATEN:
 PersonManager{
   filename='patients.ser'
   autoSaveEnabled=true
-  totalPersons=15
+  totalPersons=14
   personType='Patient'
   persons=[
-    Patient{id=1, name='Anna Meier', email='anna@web.de', birthdate=1990-01-01, ward=Ward-1}
-    Patient{id=2, name='Ben Schulz', email='b@web.de', birthdate=1985-06-15, ward=Ward-1}
-    Patient{id=3, name='Kevin Hauser', email='kevin.der.tester69@web.de', birthdate=2001-01-01, ward=Ward-2}
-    Patient{id=11, name='Isabella Wagner', email='isabella.wagner@outlook.de', birthdate=1950-01-11, ward=Ward-5}
-    Patient{id=12, name='Laura Koch', email='laura.koch@gmail.com', birthdate=2017-03-15, ward=Ward-7}
-    Patient{id=13, name='Hannah Richter', email='hannah.richter@outlook.de', birthdate=1973-06-08, ward=Ward-9}
-    Patient{id=14, name='Jakob Neumann', email='jakob.neumann@yahoo.de', birthdate=1946-12-02, ward=Ward-10}
-    Patient{id=15, name='Elena Schwarz', email='elena.schwarz@gmail.com', birthdate=2025-07-29, ward=Ward-3}
-    Patient{id=16, name='Robert Müller', email='robert.müller@t-online.de', birthdate=1970-03-18, ward=Ward-7}
-    Patient{id=17, name='Felix Klein', email='felix.klein@gmail.com', birthdate=2002-09-03, ward=Ward-8}
-    Patient{id=18, name='Lukas Hartmann', email='lukas.hartmann@yahoo.de', birthdate=1966-04-04, ward=Ward-3}
-    Patient{id=19, name='Paula Krause', email='paula.krause@t-online.de', birthdate=2005-09-20, ward=Ward-5}
-    Patient{id=20, name='Lukas Lange', email='lukas.lange@t-online.de', birthdate=1965-05-31, ward=Ward-1}
-    Patient{id=21, name='Erik Siehr', email='Test@gmail.com', birthdate=2025-08-21, ward=Ward-3}
-    Patient{id=0, name='Gutav Miller', email='45dsgfdhdc@bhd.de', birthdate=2005-01-01, ward=keine}
+    Patient{id=1, name='Meier, Anna', age=35, email='anna@web.de', ward=Ward-1}
+    Patient{id=2, name='Schulz, Ben', age=40, email='b@web.de', ward=Ward-1}
+    Patient{id=3, name='Hauser, Kevin', age=24, email='kevin.der.tester69@web.de', ward=Ward-2}
+    Patient{id=11, name='Wagner, Isabella', age=75, email='isabella.wagner@outlook.de', ward=Ward-5}
+    Patient{id=12, name='Koch, Laura', age=8, email='laura.koch@gmail.com', ward=Ward-7}
+    Patient{id=13, name='Richter, Hannah', age=52, email='hannah.richter@outlook.de', ward=Ward-9}
+    Patient{id=14, name='Neumann, Jakob', age=78, email='jakob.neumann@yahoo.de', ward=Ward-10}
+    Patient{id=15, name='Schwarz, Elena', age=0, email='elena.schwarz@gmail.com', ward=Ward-3}
+    Patient{id=16, name='Müller, Robert', age=55, email='robert.müller@t-online.de', ward=Ward-7}
+    Patient{id=17, name='Klein, Felix', age=22, email='felix.klein@gmail.com', ward=Ward-8}
+    Patient{id=18, name='Hartmann, Lukas', age=59, email='lukas.hartmann@yahoo.de', ward=Ward-3}
+    Patient{id=19, name='Krause, Paula', age=19, email='paula.krause@t-online.de', ward=Ward-5}
+    Patient{id=20, name='Lange, Lukas', age=60, email='lukas.lange@t-online.de', ward=Ward-1}
+    Patient{id=0, name='Miller, Gutav', age=20, email='45dsgfdhdc@bhd.de', ward=No Ward}
   ]
 }
 ]]></system-out>
   </testcase>
-  <testcase name="testRealEmployeeData" classname="com.healthsphere.ManagerToStringTest" time="0.004">
+  <testcase name="testRealEmployeeData" classname="com.healthsphere.ManagerToStringTest" time="0.005">
     <system-out><![CDATA[
 ============================================================
 SETUP: Lade echte Daten aus dem HealthSphere System
@@ -381,7 +378,7 @@ Daten erfolgreich aus patients.ser geladen.
 Daten erfolgreich aus employees.ser geladen.
 Daten erfolgreich aus wards.ser geladen.
 Daten erfolgreich aus treatments.ser geladen.
-✅ Patienten geladen: 15
+✅ Patienten geladen: 14
 ✅ Mitarbeiter geladen: 11
 ✅ Stationen geladen: 9
 ✅ Behandlungen geladen: 30
@@ -396,17 +393,17 @@ PersonManager{
   totalPersons=11
   personType='Employee'
   persons=[
-    Employee{id=1, name='Sam Altmen', dept='Neurology', email='hey.ho@lets.go', ward=keine}
-    Employee{id=2, name='Jakob Hofmann', dept='Radiology', email='jakob.hofmann@yahoo.de', ward=Ward-2}
-    Employee{id=3, name='Paula Wagner', dept='Neurology', email='paula.wagner@t-online.de', ward=Ward-3}
-    Employee{id=4, name='Sarah Neumann', dept='Emergency Medicine', email='sarah.neumann@yahoo.de', ward=Ward-4}
-    Employee{id=5, name='Christian Becker', dept='Emergency Medicine', email='christian.becker@web.de', ward=Ward-5}
-    Employee{id=6, name='Bianca Krüger', dept='Orthopedics', email='bianca.krüger@yahoo.de', ward=Ward-6}
-    Employee{id=7, name='Paula Richter', dept='Cardiology', email='paula.richter@web.de', ward=Ward-9}
-    Employee{id=8, name='Maximilian Becker', dept='Dermatology', email='maximilian.becker@gmail.com', ward=Ward-8}
-    Employee{id=9, name='Hannah Krüger', dept='Internal Medicine', email='hannah.krüger@yahoo.de', ward=Ward-9}
-    Employee{id=10, name='Robert Fischer', dept='Surgery', email='robert.fischer@t-online.de', ward=Ward-10}
-    Employee{id=0, name='Ben Dover', dept='Anesthesiology', email='Overdrive@medic.com', ward=keine}
+    Employee{id=1, name='Altmen, Sam', dept='Neurology', age=26, email='hey.ho@lets.go', ward=No Ward}
+    Employee{id=2, name='Hofmann, Jakob', dept='Radiology', age=39, email='jakob.hofmann@yahoo.de', ward=Ward-2}
+    Employee{id=3, name='Wagner, Paula', dept='Neurology', age=46, email='paula.wagner@t-online.de', ward=Ward-3}
+    Employee{id=4, name='Neumann, Sarah', dept='Emergency Medicine', age=47, email='sarah.neumann@yahoo.de', ward=Ward-4}
+    Employee{id=5, name='Becker, Christian', dept='Emergency Medicine', age=34, email='christian.becker@web.de', ward=Ward-5}
+    Employee{id=6, name='Krüger, Bianca', dept='Orthopedics', age=44, email='bianca.krüger@yahoo.de', ward=Ward-6}
+    Employee{id=7, name='Richter, Paula', dept='Cardiology', age=44, email='paula.richter@web.de', ward=Ward-9}
+    Employee{id=8, name='Becker, Maximilian', dept='Dermatology', age=54, email='maximilian.becker@gmail.com', ward=Ward-8}
+    Employee{id=9, name='Krüger, Hannah', dept='Internal Medicine', age=48, email='hannah.krüger@yahoo.de', ward=Ward-9}
+    Employee{id=10, name='Fischer, Robert', dept='Surgery', age=37, email='robert.fischer@t-online.de', ward=Ward-10}
+    Employee{id=0, name='Dover, Ben', dept='Anesthesiology', age=41, email='Overdrive@medic.com', ward=No Ward}
   ]
 }
 ]]></system-out>
